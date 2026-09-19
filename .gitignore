@@ -1,0 +1,28 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Java / Gradle
+.gradle/
+build/
+out/
+
+# Spring Boot
+*.log
+
+# Node / React
+node_modules/
+frontend/dist/
+frontend/build/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
