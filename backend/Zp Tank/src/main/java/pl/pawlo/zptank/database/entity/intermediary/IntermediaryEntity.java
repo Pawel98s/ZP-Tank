@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "intermediaryId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

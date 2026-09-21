@@ -6,7 +6,7 @@ import pl.pawlo.zptank.database.entity.client.ClientEntity;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "deliveryAddressID")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

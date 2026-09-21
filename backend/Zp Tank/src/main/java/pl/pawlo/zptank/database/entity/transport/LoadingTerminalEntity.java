@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "loadingTerminalId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,8 +23,8 @@ public class LoadingTerminalEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "address_id", unique = true, nullable = false)
     private AddressEntity address;
 
     @Column(name = "quantity", precision = 19, scale = 3)

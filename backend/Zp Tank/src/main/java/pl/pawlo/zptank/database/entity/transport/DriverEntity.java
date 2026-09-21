@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "driverId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

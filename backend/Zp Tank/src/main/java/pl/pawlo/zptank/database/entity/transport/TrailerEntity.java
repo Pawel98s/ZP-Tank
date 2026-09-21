@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "trailerId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

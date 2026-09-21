@@ -5,7 +5,7 @@ import lombok.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "addressId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "companyId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

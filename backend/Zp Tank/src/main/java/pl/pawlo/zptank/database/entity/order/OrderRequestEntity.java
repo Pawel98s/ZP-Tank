@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "orderRequestId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

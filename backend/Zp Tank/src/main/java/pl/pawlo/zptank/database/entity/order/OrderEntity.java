@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "orderId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,12 +45,12 @@ public class OrderEntity {
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "intermediary_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "intermediary_id", nullable = false)
     private IntermediaryEntity intermediary;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "waybill_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "waybill_id", unique = true, nullable = false)
     private WaybillEntity waybill;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

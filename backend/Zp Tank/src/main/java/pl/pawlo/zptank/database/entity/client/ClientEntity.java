@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "clientId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,8 +29,8 @@ public class ClientEntity {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_address_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "company_address_id", unique = true, nullable = false)
     private AddressEntity companyAddress;
 
     @OneToMany(mappedBy = "client")

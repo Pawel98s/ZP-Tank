@@ -6,7 +6,7 @@ import pl.pawlo.zptank.database.entity.order.OrderEntity;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "huzarsentId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

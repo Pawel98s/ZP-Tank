@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "transportId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "transportSetId")
+@EqualsAndHashCode(of = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
