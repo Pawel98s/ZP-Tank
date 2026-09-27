@@ -8,6 +8,10 @@ import pl.pawlo.zptank.database.repository.mapper.ClientEntityMapper;
 import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.dao.ClientDAO;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Repository
 @AllArgsConstructor
 public class ClientRepository implements ClientDAO {
@@ -21,4 +25,20 @@ public class ClientRepository implements ClientDAO {
         ClientEntity save = clientJpaRepository.save(clientEntityMapper.mapToEntity(client));
         return clientEntityMapper.mapToDomain(save);
     }
+
+    @Override
+    public List<Client> findAll() {
+        return clientJpaRepository.findAll()
+                .stream()
+                .map(clientEntityMapper::mapToDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<Client> findById(Long id) {
+        return clientJpaRepository.findById(id)
+                .map(clientEntityMapper::mapToDomain);
+    }
+
+
 }

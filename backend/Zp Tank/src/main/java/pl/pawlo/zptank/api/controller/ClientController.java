@@ -2,14 +2,15 @@ package pl.pawlo.zptank.api.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.pawlo.zptank.api.dto.client.ClientDTO;
 import pl.pawlo.zptank.api.mapper.ClientMapper;
 import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.ClientService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -25,4 +26,20 @@ public class ClientController {
         Client saveClient = clientService.save(client);
         return clientMapper.mapToDTO(saveClient);
     }
+
+    @GetMapping
+    public List<ClientDTO> findAll(){
+        List<Client> clients = clientService.findAll();
+        return clients.stream()
+                .map(clientMapper::mapToDTO)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public ClientDTO findById(@PathVariable Long id){
+        Client client = clientService.findById(id);
+        return clientMapper.mapToDTO(client);
+    }
+
+
 }
