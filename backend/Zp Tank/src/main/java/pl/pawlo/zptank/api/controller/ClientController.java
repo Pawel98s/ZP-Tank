@@ -2,6 +2,7 @@ package pl.pawlo.zptank.api.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.pawlo.zptank.api.dto.client.ClientDTO;
 import pl.pawlo.zptank.api.mapper.ClientMapper;
@@ -17,9 +18,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ClientController {
 
-    ClientService clientService;
-    ClientMapper clientMapper;
+    private final ClientService clientService;
+    private final ClientMapper clientMapper;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ClientDTO save(@RequestBody ClientDTO clientDTO){
         Client client = clientMapper.mapToDomain(clientDTO);
