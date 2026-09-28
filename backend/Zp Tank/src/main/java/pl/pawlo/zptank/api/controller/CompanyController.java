@@ -19,9 +19,22 @@ public class CompanyController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CompanyDTO save(@RequestBody CompanyDTO companyDTO){
+    public CompanyDTO save(@RequestBody CompanyDTO companyDTO) {
         Company save = companyService.save(companyMapper.mapToDomain(companyDTO));
         return companyMapper.mapToDTO(save);
     }
 
+    @GetMapping("/{id}")
+    public CompanyDTO findById(@PathVariable Long id) {
+        Company company = companyService.findById(id);
+        return companyMapper.mapToDTO(company);
+    }
+
+    @PatchMapping("/{id}")
+    public CompanyDTO update(@PathVariable Long id,
+                             @RequestBody CompanyDTO companyDTO) {
+        Company company = companyMapper.mapToDomain(companyDTO);
+        Company update = companyService.update(id, company);
+        return companyMapper.mapToDTO(update);
+    }
 }

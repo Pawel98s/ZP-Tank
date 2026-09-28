@@ -14,4 +14,39 @@ public class CompanyService {
     public Company save(Company company){
         return companyDAO.save(company);
     }
+
+    public Company findById(Long id){
+        return companyDAO.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+    }
+
+    public Company update(Long id, Company company) {
+        Company existingCompany = findById(id);
+
+        Company updateCompany = Company.builder()
+                .id(existingCompany.getId())
+                .name(company.getName() != null
+                        ? company.getName()
+                        : existingCompany.getName())
+                .carrierLiabilityInsuranceValidUntil(company.getCarrierLiabilityInsuranceValidUntil() != null
+                        ? company.getCarrierLiabilityInsuranceValidUntil()
+                        : existingCompany.getCarrierLiabilityInsuranceValidUntil())
+                .businessLiabilityInsuranceValidUntil(company.getBusinessLiabilityInsuranceValidUntil() != null
+                        ? company.getBusinessLiabilityInsuranceValidUntil()
+                        : existingCompany.getBusinessLiabilityInsuranceValidUntil())
+                .cashRegisterInspectionDate(company.getCashRegisterInspectionDate() != null
+                        ? company.getCashRegisterInspectionDate()
+                        : existingCompany.getCashRegisterInspectionDate())
+                .companyCardValidUntil(company.getCompanyCardValidUntil() != null
+                        ? company.getCompanyCardValidUntil()
+                        : existingCompany.getCompanyCardValidUntil())
+                .ppkValidUntil(company.getPpkValidUntil() != null
+                        ? company.getPpkValidUntil()
+                        : existingCompany.getPpkValidUntil())
+                .build();
+
+        return companyDAO.update(updateCompany);
+    }
+
+
 }

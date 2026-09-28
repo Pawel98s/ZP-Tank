@@ -8,6 +8,8 @@ import pl.pawlo.zptank.database.repository.mapper.CompanyEntityMapper;
 import pl.pawlo.zptank.domain.company.Company;
 import pl.pawlo.zptank.service.dao.CompanyDAO;
 
+import java.util.Optional;
+
 @Repository
 @AllArgsConstructor
 public class CompanyRepository implements CompanyDAO {
@@ -18,6 +20,19 @@ public class CompanyRepository implements CompanyDAO {
 
     @Override
     public Company save(Company company) {
+        CompanyEntity save = companyJpaRepository.save(companyEntityMapper.mapToEntity(company));
+        return companyEntityMapper.mapToDomain(save);
+    }
+
+    @Override
+    public Optional<Company> findById(Long id) {
+        return companyJpaRepository.findById(id)
+                .map(companyEntityMapper::mapToDomain);
+    }
+
+    @Override
+    public Company update(Company company) {
+
         CompanyEntity save = companyJpaRepository.save(companyEntityMapper.mapToEntity(company));
         return companyEntityMapper.mapToDomain(save);
     }
