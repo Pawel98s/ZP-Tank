@@ -104,7 +104,7 @@ public class ClientServiceTest {
 
         Mockito.when(clientDAO.findById(1L)).thenReturn(Optional.of(client));
 
-        Mockito.when(clientDAO.update(1L, expectedClient)).thenReturn(expectedClient);
+        Mockito.when(clientDAO.update(expectedClient)).thenReturn(expectedClient);
 
         Client result = clientService.update(1L, updatedClient);
 

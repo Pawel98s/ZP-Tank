@@ -13,7 +13,7 @@ public interface ClientDAO {
 
     Optional<Client> findById(Long id);
 
-    Client update(Long id, Client client);
+    Client update(Client client);
 
     void delete(Long id);
 

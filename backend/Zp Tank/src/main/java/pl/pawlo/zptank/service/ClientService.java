@@ -65,7 +65,7 @@ public class ClientService {
                 .orderRequests(existingClient.getOrderRequests())
                 .build();
 
-        return clientDAO.update(id, updatedClient);
+        return clientDAO.update(updatedClient);
     }
 
     public void delete(Long id) {
