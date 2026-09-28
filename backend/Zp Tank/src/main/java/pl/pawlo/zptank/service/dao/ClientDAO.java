@@ -12,4 +12,9 @@ public interface ClientDAO {
     List<Client> findAll();
 
     Optional<Client> findById(Long id);
+
+    Client update(Long id, Client client);
+
+    void delete(Long id);
+
 }

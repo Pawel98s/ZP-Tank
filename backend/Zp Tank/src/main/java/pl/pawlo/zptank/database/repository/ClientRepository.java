@@ -40,5 +40,23 @@ public class ClientRepository implements ClientDAO {
                 .map(clientEntityMapper::mapToDomain);
     }
 
+    @Override
+    public Client update(Long id, Client client) {
+        ClientEntity existingEntity = clientJpaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        clientEntityMapper.updateEntity(client,existingEntity);
+
+        ClientEntity save = clientJpaRepository.save(existingEntity);
+
+        return clientEntityMapper.mapToDomain(save);
+
+    }
+
+    @Override
+    public void delete(Long id) {
+        clientJpaRepository.deleteById(id);
+    }
+
 
 }

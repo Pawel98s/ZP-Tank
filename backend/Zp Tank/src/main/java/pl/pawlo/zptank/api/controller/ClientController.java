@@ -41,5 +41,17 @@ public class ClientController {
         return clientMapper.mapToDTO(client);
     }
 
+    @PatchMapping("/{id}")
+    public ClientDTO update(@PathVariable Long id,
+                            @RequestBody ClientDTO clientDTO){
+        Client client = clientMapper.mapToDomain(clientDTO);
+        Client updatedClient = clientService.update(id, client);
+        return clientMapper.mapToDTO(updatedClient);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id){
+        clientService.delete(id);
+    }
 
 }

@@ -12,6 +12,7 @@ import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.dao.ClientDAO;
 
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class ClientServiceTest {
@@ -62,5 +63,71 @@ public class ClientServiceTest {
 
         Assertions.assertThat(clients).hasSize(2);
         Assertions.assertThat(clients.get(0).getName()).isEqualTo("Coco");
+    }
+
+    @Test
+    void shouldFindClientById(){
+
+        Client client = Client.builder()
+                .id(1L)
+                .taxId("123123")
+                .name("Coco")
+                .build();
+
+        Mockito.when(clientDAO.findById(1L)).thenReturn(Optional.ofNullable(client));
+
+        Client clientById = clientService.findById(1L);
+
+        Assertions.assertThat(clientById).isEqualTo(client);
+        Assertions.assertThat(clientById.getName()).isEqualTo("Coco");
+
+    }
+
+    @Test
+    void shouldUpdateClient() {
+        Client client = Client.builder()
+                .id(1L)
+                .taxId("123123")
+                .name("Coco")
+                .build();
+
+        Client updatedClient = Client.builder()
+                .taxId("44444")
+                .name("CocoNew")
+                .build();
+
+        Client expectedClient = Client.builder()
+                .id(1L)
+                .taxId("44444")
+                .name("CocoNew")
+                .build();
+
+        Mockito.when(clientDAO.findById(1L)).thenReturn(Optional.of(client));
+
+        Mockito.when(clientDAO.update(1L, expectedClient)).thenReturn(expectedClient);
+
+        Client result = clientService.update(1L, updatedClient);
+
+        Assertions.assertThat(result).isEqualTo(expectedClient);
+        Assertions.assertThat(result.getName()).isEqualTo("CocoNew");
+    }
+
+
+    @Test
+    void shouldDeleteClient() {
+        Long clientId = 1L;
+
+        Client client = Client.builder()
+                .id(clientId)
+                .name("Coco")
+                .taxId("123123")
+                .build();
+
+        Mockito.when(clientDAO.findById(clientId))
+                .thenReturn(Optional.of(client));
+
+        clientService.delete(clientId);
+
+        Mockito.verify(clientDAO).delete(clientId);
     }
 }
