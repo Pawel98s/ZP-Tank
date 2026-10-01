@@ -1,7 +1,6 @@
 package pl.pawlo.zptank.api.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.pawlo.zptank.api.dto.client.ClientDTO;
@@ -10,8 +9,6 @@ import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.ClientService;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clients")
