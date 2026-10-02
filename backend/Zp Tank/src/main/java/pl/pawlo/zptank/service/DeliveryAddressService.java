@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.address.DeliveryAddress;
 import pl.pawlo.zptank.service.dao.DeliveryAddressDAO;
 
@@ -20,6 +21,8 @@ public class DeliveryAddressService {
                 .orElseThrow(() -> new RuntimeException("Delivery address not found"));
     }
 
+
+    @Transactional
     public DeliveryAddress update(Long id, DeliveryAddress deliveryAddress) {
         DeliveryAddress existingDeliveryAddress = findById(id);
 

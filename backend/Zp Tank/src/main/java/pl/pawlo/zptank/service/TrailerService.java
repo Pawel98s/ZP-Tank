@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.transport.Trailer;
 import pl.pawlo.zptank.service.dao.TrailerDAO;
 
@@ -26,6 +27,7 @@ public class TrailerService {
         return trailerDAO.findAll();
     }
 
+    @Transactional
     public Trailer update(Long id, Trailer trailer) {
         Trailer existingTrailer = findById(id);
 

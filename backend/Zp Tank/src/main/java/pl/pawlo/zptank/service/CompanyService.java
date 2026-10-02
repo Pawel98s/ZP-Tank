@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.company.Company;
 import pl.pawlo.zptank.service.dao.CompanyDAO;
 
@@ -20,6 +21,7 @@ public class CompanyService {
                 .orElseThrow(() -> new RuntimeException("Company not found"));
     }
 
+    @Transactional
     public Company update(Long id, Company company) {
         Company existingCompany = findById(id);
 

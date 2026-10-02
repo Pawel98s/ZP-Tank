@@ -3,6 +3,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.transport.TankerTruck;
 import pl.pawlo.zptank.service.dao.TankerTruckDAO;
 
@@ -27,6 +28,8 @@ public class TankerTruckService {
         return tankerTruckDAO.findAll();
     }
 
+
+    @Transactional
     public TankerTruck update(Long id, TankerTruck tankerTruck) {
         TankerTruck existingTankerTruck = findById(id);
 

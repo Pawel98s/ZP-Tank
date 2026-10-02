@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.transport.Tractor;
 import pl.pawlo.zptank.service.dao.TractorDAO;
 
@@ -26,6 +27,7 @@ public class TractorService {
         return tractorDAO.findAll();
     }
 
+    @Transactional
     public Tractor update(Long id, Tractor tractor) {
         Tractor existingTractor = findById(id);
 

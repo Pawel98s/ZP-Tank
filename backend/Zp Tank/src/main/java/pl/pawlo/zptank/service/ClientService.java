@@ -3,6 +3,7 @@ package pl.pawlo.zptank.service;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.api.dto.client.ClientDTO;
 import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.dao.ClientDAO;
@@ -29,6 +30,8 @@ public class ClientService {
                 .orElseThrow(() -> new RuntimeException("Client not found"));
     }
 
+
+    @Transactional
     public Client update(Long id, Client client) {
 
         Client existingClient = findById(id);
