@@ -22,7 +22,7 @@ public class TransportSetController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public TransportSetDTO save(@RequestBody TransportSetDTO transportSetDTO) {
-        TransportSet save = transportSetService.save(transportSetMapper.mapToDomain(transportSetDTO));
+        TransportSet save = transportSetService.create(transportSetMapper.mapToDomain(transportSetDTO));
         return transportSetMapper.mapToDTO(save);
     }
 
