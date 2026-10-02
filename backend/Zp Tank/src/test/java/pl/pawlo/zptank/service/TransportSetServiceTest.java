@@ -13,11 +13,22 @@ import pl.pawlo.zptank.domain.transport.Trailer;
 import pl.pawlo.zptank.domain.transport.TransportSet;
 import pl.pawlo.zptank.service.dao.TransportSetDAO;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 public class TransportSetServiceTest {
 
     @Mock
     private TransportSetDAO transportSetDAO;
+
+    @Mock
+    private TrailerService trailerService;
+
+    @Mock
+    private TractorService tractorService;
+
+    @Mock
+    private TankerTruckService tankerTruckService;
 
     @InjectMocks
     private TransportSetService transportSetService;
@@ -81,7 +92,7 @@ public class TransportSetServiceTest {
                         .build())
                 .build();
 
-        Mockito.when(transportSetDAO.findById(1L)).thenReturn(java.util.Optional.of(transportSet));
+        Mockito.when(transportSetDAO.findById(1L)).thenReturn(Optional.of(transportSet));
 
         TransportSet result = transportSetService.findById(1L);
 
@@ -212,5 +223,28 @@ public class TransportSetServiceTest {
         java.util.List<TransportSet> result = transportSetService.findAll();
 
         Assertions.assertThat(result).containsExactlyInAnyOrder(transportSet1, transportSet2);
+    }
+
+    @Test
+    void shouldCreateTransportSetWithTractorAndTrailer() {
+        TransportSet transportSet = TransportSet.builder()
+                .active(true)
+                .tractor(Tractor.builder()
+                        .id(2L)
+                        .registrationNumber("DEF456")
+                        .build())
+                .trailer(Trailer.builder()
+                        .id(3L)
+                        .registrationNumber("GHI789")
+                        .build())
+                .build();
+
+        Mockito.when(tractorService.findById(2L)).thenReturn(transportSet.getTractor());
+        Mockito.when(trailerService.findById(3L)).thenReturn(transportSet.getTrailer());
+        Mockito.when(transportSetDAO.save(transportSet)).thenReturn(transportSet);
+
+        TransportSet result = transportSetService.create(transportSet);
+
+        Assertions.assertThat(result).isEqualTo(transportSet);
     }
 }
