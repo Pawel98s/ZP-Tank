@@ -2,6 +2,7 @@ package pl.pawlo.zptank.database.entity.order;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import pl.pawlo.zptank.database.entity.client.ClientEntity;
 import pl.pawlo.zptank.database.entity.product.ProductEntity;
 import pl.pawlo.zptank.domain.OrderRequestStatus;
@@ -28,7 +29,8 @@ public class OrderRequestEntity {
     @Column(name = "status", nullable = false, length = 50)
     private OrderRequestStatus status;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,21 +1,19 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pawlo.zptank.api.dto.client.ClientDTO;
+import pl.pawlo.zptank.domain.address.Address;
 import pl.pawlo.zptank.domain.client.Client;
 import pl.pawlo.zptank.service.dao.ClientDAO;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class ClientService {
 
-    ClientDAO clientDAO;
+    private ClientDAO clientDAO;
 
     public Client save(Client client){
        return clientDAO.save(client);

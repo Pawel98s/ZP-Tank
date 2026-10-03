@@ -29,7 +29,7 @@ public class ClientEntity {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "company_address_id", unique = true, nullable = false)
     private AddressEntity companyAddress;
 
