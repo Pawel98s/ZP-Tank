@@ -15,7 +15,7 @@ public class Driver {
     private String phone;
     private String login;
     private String password;
-    private boolean active;
+    private Boolean active;
     private TransportSet transportSet;
     private LocalDate driverCardValidUntil;
     private LocalDate adrValidUntil;

@@ -35,7 +35,7 @@ public class DriverEntity {
     private String password;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private Boolean active;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transport_set_id", unique = true)

@@ -16,7 +16,7 @@ public class DriverDTO {
     private String phone;
     private String login;
     private String password;
-    private boolean active;
+    private Boolean active;
     private TransportSetDTO transportSet;
     private LocalDate driverCardValidUntil;
     private LocalDate adrValidUntil;

@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import pl.pawlo.zptank.api.dto.transport.DriverDTO;
 import pl.pawlo.zptank.domain.transport.Driver;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = TransportSetMapper.class)
 public interface DriverMapper {
 
     Driver mapToDomain(final DriverDTO driverDTO);
