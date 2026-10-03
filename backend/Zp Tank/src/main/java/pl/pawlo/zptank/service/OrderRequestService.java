@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.pawlo.zptank.domain.OrderRequestStatus;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 import pl.pawlo.zptank.service.dao.OrderRequestDAO;
 
@@ -61,6 +62,25 @@ public class OrderRequestService {
                 .order(orderRequest.getOrder() != null
                         ? orderRequest.getOrder()
                         : existingOrderRequest.getOrder())
+                .build();
+
+        return orderRequestDAO.update(updatedOrderRequest);
+    }
+    public OrderRequest updateStatus(Long id, OrderRequestStatus status) {
+
+        OrderRequest existingOrderRequest = findById(id);
+
+        OrderRequest updatedOrderRequest = OrderRequest.builder()
+                .id(existingOrderRequest.getId())
+                .status(status)
+                .createdAt(existingOrderRequest.getCreatedAt())
+                .client(existingOrderRequest.getClient())
+                .product(existingOrderRequest.getProduct())
+                .quantity(existingOrderRequest.getQuantity())
+                .price(existingOrderRequest.getPrice())
+                .executionDate(existingOrderRequest.getExecutionDate())
+                .notes(existingOrderRequest.getNotes())
+                .order(existingOrderRequest.getOrder())
                 .build();
 
         return orderRequestDAO.update(updatedOrderRequest);
