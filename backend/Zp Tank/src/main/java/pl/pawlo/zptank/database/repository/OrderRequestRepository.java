@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import pl.pawlo.zptank.database.entity.order.OrderRequestEntity;
 import pl.pawlo.zptank.database.repository.jpa.order.OrderRequestJpaRepository;
 import pl.pawlo.zptank.database.repository.mapper.OrderRequestEntityMapper;
+import pl.pawlo.zptank.domain.OrderRequestStatus;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 import pl.pawlo.zptank.service.dao.OrderRequestDAO;
 
@@ -48,5 +49,13 @@ public class OrderRequestRepository implements OrderRequestDAO {
     @Override
     public void delete(Long id) {
         orderRequestJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<OrderRequest> findByStatus(OrderRequestStatus status) {
+        return orderRequestJpaRepository.findByStatus(status)
+                .stream()
+                .map(orderRequestEntityMapper::mapToDomain)
+                .toList();
     }
 }

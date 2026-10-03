@@ -1,5 +1,6 @@
 package pl.pawlo.zptank.service.dao;
 
+import pl.pawlo.zptank.domain.OrderRequestStatus;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 
 import java.util.List;
@@ -16,6 +17,8 @@ public interface OrderRequestDAO {
     OrderRequest update(OrderRequest orderRequest);
 
     void delete(Long id);
+
+    List<OrderRequest> findByStatus(OrderRequestStatus status);
 
 
 }

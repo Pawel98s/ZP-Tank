@@ -66,6 +66,8 @@ public class OrderRequestService {
 
         return orderRequestDAO.update(updatedOrderRequest);
     }
+
+
     public OrderRequest updateStatus(Long id, OrderRequestStatus status) {
 
         OrderRequest existingOrderRequest = findById(id);
@@ -84,6 +86,10 @@ public class OrderRequestService {
                 .build();
 
         return orderRequestDAO.update(updatedOrderRequest);
+    }
+
+    public List<OrderRequest> findByStatus(OrderRequestStatus status) {
+        return  orderRequestDAO.findByStatus(status);
     }
 
 }

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.pawlo.zptank.domain.OrderRequestStatus;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 import pl.pawlo.zptank.service.dao.OrderRequestDAO;
 
@@ -108,4 +109,57 @@ public class OrderRequestServiceTest {
         Assertions.assertThat(update).isEqualTo(orderRequest2);
 
     }
+
+    @Test
+    void shouldUpdateOrderRequestStatus() {
+
+        OrderRequest existingOrderRequest = OrderRequest.builder()
+                .id(1L)
+                .status(OrderRequestStatus.NEW)
+                .price(new BigDecimal(10))
+                .build();
+
+        OrderRequest updatedOrderRequest = OrderRequest.builder()
+                .id(1L)
+                .status(OrderRequestStatus.CONFIRMED)
+                .price(new BigDecimal(10))
+                .build();
+
+        Mockito.when(orderRequestDAO.findById(1L)).thenReturn(Optional.of(existingOrderRequest));
+
+        Mockito.when(orderRequestDAO.update(updatedOrderRequest)).thenReturn(updatedOrderRequest);
+
+        OrderRequest result = orderRequestService.updateStatus(1L, OrderRequestStatus.CONFIRMED);
+
+        Assertions.assertThat(result).isEqualTo(updatedOrderRequest);
+
+        Mockito.verify(orderRequestDAO).update(updatedOrderRequest);
+    }
+
+    @Test
+    void shouldFindOrderRequestsByStatus() {
+
+        OrderRequest orderRequest1 = OrderRequest.builder()
+                .id(1L)
+                .status(OrderRequestStatus.NEW)
+                .price(new BigDecimal(10))
+                .build();
+
+        OrderRequest orderRequest2 = OrderRequest.builder()
+                .id(2L)
+                .status(OrderRequestStatus.NEW)
+                .price(new BigDecimal(20))
+                .build();
+
+        Mockito.when(orderRequestDAO.findByStatus(OrderRequestStatus.NEW)).thenReturn(List.of(orderRequest1, orderRequest2));
+
+        List<OrderRequest> result = orderRequestService.findByStatus(OrderRequestStatus.NEW);
+
+        Assertions.assertThat(result).containsExactly(orderRequest1, orderRequest2);
+
+        Assertions.assertThat(result).hasSize(2);
+
+        Mockito.verify(orderRequestDAO).findByStatus(OrderRequestStatus.NEW);
+    }
+
 }
