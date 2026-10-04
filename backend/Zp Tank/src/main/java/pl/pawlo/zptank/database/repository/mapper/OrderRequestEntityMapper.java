@@ -5,7 +5,12 @@ import org.mapstruct.ReportingPolicy;
 import pl.pawlo.zptank.database.entity.order.OrderRequestEntity;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = {
+                ClientEntityMapper.class
+        })
 public interface OrderRequestEntityMapper {
 
     OrderRequest mapToDomain(OrderRequestEntity orderRequestEntity);

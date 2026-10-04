@@ -10,6 +10,7 @@ import pl.pawlo.zptank.domain.client.Client;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ClientEntityMapper {
 
+    @Mapping(target = "orderRequests", ignore = true)
     Client mapToDomain(final ClientEntity clientEntity);
 
     ClientEntity mapToEntity(final Client client);
