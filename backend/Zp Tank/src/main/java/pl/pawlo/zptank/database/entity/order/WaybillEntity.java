@@ -12,7 +12,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "waybills")
+@Table(name = "waybills", uniqueConstraints = {
+@UniqueConstraint(
+        name = "uk_waybill_number",
+        columnNames = "waybill_number")})
 public class WaybillEntity {
 
     @Id
