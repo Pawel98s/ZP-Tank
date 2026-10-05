@@ -53,8 +53,7 @@ public class OrderRequestEntity {
     @Column(name = "notes")
     private String notes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @OneToOne(mappedBy = "orderRequest", fetch = FetchType.LAZY)
     private OrderEntity order;
 
 }

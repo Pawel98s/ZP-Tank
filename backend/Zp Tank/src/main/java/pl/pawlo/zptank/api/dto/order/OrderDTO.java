@@ -19,7 +19,7 @@ public class OrderDTO {
 
     private Long id;
     private OrderStatus status;
-    private List<OrderRequestDTO> orderRequests = new ArrayList<>();
+    private OrderRequestDTO orderRequest;
     private LocalDateTime createdAt;
     private LocalDate executionDate;
     private LocalDate plannedDeliveryDate;

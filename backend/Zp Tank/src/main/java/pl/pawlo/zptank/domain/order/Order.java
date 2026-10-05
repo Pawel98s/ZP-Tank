@@ -18,7 +18,7 @@ public class Order {
 
     private Long id;
     private OrderStatus status;
-    private List<OrderRequest> orderRequests;
+    private OrderRequest orderRequest;
     private LocalDateTime createdAt;
     private LocalDate executionDate;
     private LocalDate plannedDeliveryDate;

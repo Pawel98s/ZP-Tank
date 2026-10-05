@@ -30,8 +30,9 @@ public class OrderEntity {
     @Column(name = "status", nullable = false, length = 50)
     private OrderStatus status;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderRequestEntity> orderRequests = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_request_id", nullable = false, unique = true)
+    private OrderRequestEntity orderRequest;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
