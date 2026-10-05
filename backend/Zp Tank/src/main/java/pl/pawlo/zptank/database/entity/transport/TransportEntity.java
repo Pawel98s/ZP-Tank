@@ -32,7 +32,7 @@ public class TransportEntity {
     private DriverEntity driver;
 
     @OneToMany(mappedBy = "transport")
-    private List<OrderEntity> orders = new ArrayList<>();
+    private List<OrderEntity> orders;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "loading_terminal_id", nullable = false)

@@ -2,6 +2,7 @@ package pl.pawlo.zptank.database.entity.order;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import pl.pawlo.zptank.database.entity.address.DeliveryAddressEntity;
 import pl.pawlo.zptank.database.entity.intermediary.IntermediaryEntity;
 import pl.pawlo.zptank.database.entity.transport.TransportEntity;
@@ -34,7 +35,8 @@ public class OrderEntity {
     @JoinColumn(name = "order_request_id", nullable = false, unique = true)
     private OrderRequestEntity orderRequest;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "execution_date")

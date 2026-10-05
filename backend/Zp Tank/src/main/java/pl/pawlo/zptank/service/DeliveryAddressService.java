@@ -10,7 +10,7 @@ import pl.pawlo.zptank.service.dao.DeliveryAddressDAO;
 @AllArgsConstructor
 public class DeliveryAddressService {
 
-    DeliveryAddressDAO deliveryAddressDAO;
+   private final DeliveryAddressDAO deliveryAddressDAO;
 
     public DeliveryAddress save(DeliveryAddress deliveryAddress){
         return deliveryAddressDAO.save(deliveryAddress);

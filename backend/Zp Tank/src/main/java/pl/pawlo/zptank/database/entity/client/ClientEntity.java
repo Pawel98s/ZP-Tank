@@ -34,7 +34,7 @@ public class ClientEntity {
     private AddressEntity companyAddress;
 
     @OneToMany(mappedBy = "client")
-    private List<DeliveryAddressEntity> deliveryAddresses = new ArrayList<>();
+    private List<DeliveryAddressEntity> deliveryAddresses;
 
     @Column(name = "phone")
     private String phone;
@@ -52,6 +52,6 @@ public class ClientEntity {
     private String password;
 
     @OneToMany(mappedBy = "client")
-    private List<OrderRequestEntity> orderRequests = new ArrayList<>();
+    private List<OrderRequestEntity> orderRequests;
 
 }
