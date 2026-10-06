@@ -7,7 +7,7 @@ import org.mapstruct.ReportingPolicy;
 import pl.pawlo.zptank.database.entity.client.ClientEntity;
 import pl.pawlo.zptank.domain.client.Client;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {DeliveryAddressEntityMapper.class})
 public interface ClientEntityMapper {
 
     @Mapping(target = "orderRequests", ignore = true)

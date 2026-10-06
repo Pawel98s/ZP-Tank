@@ -10,6 +10,8 @@ import pl.pawlo.zptank.api.mapper.OrderMapper;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.service.OrderService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/orders")
@@ -33,6 +35,14 @@ public class OrderController {
     public OrderDTO findById(@PathVariable Long id) {
         Order order = orderService.findById(id);
         return orderMapper.mapToDTO(order);
+    }
+
+    @GetMapping()
+    public List<OrderDTO> findAll() {
+        return orderService.findAll()
+                .stream()
+                .map(orderMapper::mapToDTO)
+                .toList();
     }
 
 
