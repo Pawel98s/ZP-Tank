@@ -2,6 +2,7 @@ package pl.pawlo.zptank.api;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import pl.pawlo.zptank.service.OrderService;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,7 +38,6 @@ public class OrderControllerTest {
 
     @Test
     void shouldCreateOrder() throws Exception {
-
 
         Order order = Order.builder()
                 .id(1L)
@@ -77,5 +78,33 @@ public class OrderControllerTest {
 
         verify(orderMapper)
                 .mapToDTO(order);
+    }
+
+    @Test
+    void shouldFindById() throws Exception{
+        Order order = Order.builder()
+                .id(1L)
+                .status(OrderStatus.NEW)
+                .build();
+
+        OrderDTO orderDTO = OrderDTO.builder()
+                .id(1L)
+                .status(OrderStatus.NEW)
+                .build();
+
+        Mockito.when(orderService.findById(1L)).thenReturn(order);
+        Mockito.when(orderMapper.mapToDTO(order)).thenReturn(orderDTO);
+
+
+        mockMvc.perform(
+                get("/api/orders/1")
+                        .with(user("testUser"))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.status").value("NEW"));
+
+        Mockito.verify(orderService).findById(1L);
+        Mockito.verify(orderMapper).mapToDTO(order);
     }
 }

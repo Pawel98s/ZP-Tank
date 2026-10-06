@@ -29,5 +29,11 @@ public class OrderController {
         return orderMapper.mapToDTO(order);
     }
 
+    @GetMapping("/{id}")
+    public OrderDTO findById(@PathVariable Long id) {
+        Order order = orderService.findById(id);
+        return orderMapper.mapToDTO(order);
+    }
+
 
 }
