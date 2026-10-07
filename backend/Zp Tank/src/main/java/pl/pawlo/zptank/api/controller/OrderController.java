@@ -45,5 +45,13 @@ public class OrderController {
                 .toList();
     }
 
+    @PatchMapping("/{id}")
+    public OrderDTO updateOrder(@PathVariable Long id,
+                                @RequestBody OrderDTO orderDTO) {
+        Order order = orderMapper.mapToDomain(orderDTO);
+        Order update = orderService.update(id, order);
+        return orderMapper.mapToDTO(update);
+    }
+
 
 }
