@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.pawlo.zptank.api.dto.order.CreateOrderDTO;
 import pl.pawlo.zptank.api.dto.order.OrderDTO;
+import pl.pawlo.zptank.api.dto.order.UpdateOrderStatusDTO;
 import pl.pawlo.zptank.api.mapper.OrderMapper;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.service.OrderService;
@@ -51,6 +52,13 @@ public class OrderController {
         Order order = orderMapper.mapToDomain(orderDTO);
         Order update = orderService.update(id, order);
         return orderMapper.mapToDTO(update);
+    }
+
+    @PatchMapping("/{id}/status")
+    public OrderDTO updateStatus(@PathVariable Long id,
+                                 @RequestBody UpdateOrderStatusDTO statusDTO) {
+        Order order = orderService.updateStatus(id, statusDTO.getOrderStatus());
+        return orderMapper.mapToDTO(order);
     }
 
 

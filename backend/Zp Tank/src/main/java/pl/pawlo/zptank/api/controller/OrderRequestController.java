@@ -58,12 +58,12 @@ public class OrderRequestController {
         return orderRequestMapper.mapToDTO(update);
     }
 
-    @PatchMapping("{id}/status")
+    @PatchMapping("/{id}/status")
     public OrderRequestDTO updateStatus(@PathVariable Long id,
                                         @RequestBody UpdateOrderRequestStatusDTO request){
 
         OrderRequest orderRequest = orderRequestService.updateStatus(id, request.getOrderRequestStatus());
-        return  orderRequestMapper.mapToDTO(orderRequest);
+        return orderRequestMapper.mapToDTO(orderRequest);
     }
 
     @DeleteMapping("/{id}")

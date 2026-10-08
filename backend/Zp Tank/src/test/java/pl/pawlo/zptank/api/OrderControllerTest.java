@@ -1,5 +1,6 @@
 package pl.pawlo.zptank.api;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -200,5 +201,43 @@ public class OrderControllerTest {
         Mockito.verify(orderService).update(1L, orderUpdate);
 
         Mockito.verify(orderMapper).mapToDTO(orderUpdate);
+    }
+
+
+    @Test
+    void shouldUpdateOrderStatus() throws Exception {
+
+        Order order = Order.builder()
+                .id(1L)
+                .status(OrderStatus.NEW)
+                .build();
+
+        OrderDTO orderDTO = OrderDTO.builder()
+                .id(1L)
+                .status(OrderStatus.NEW)
+                .build();
+
+        Mockito.when(orderService.updateStatus(1L, OrderStatus.NEW)).thenReturn(order);
+
+        Mockito.when(orderMapper.mapToDTO(order)).thenReturn(orderDTO);
+
+        mockMvc.perform(
+                        patch("/api/orders/1/status")
+                                .with(user("testUser"))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                    {
+                                        "orderStatus": "NEW"
+                                    }
+                                    """)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.status").value("NEW"));
+
+        Mockito.verify(orderService).updateStatus(1L, OrderStatus.NEW);
+
+        Mockito.verify(orderMapper).mapToDTO(order);
     }
 }
