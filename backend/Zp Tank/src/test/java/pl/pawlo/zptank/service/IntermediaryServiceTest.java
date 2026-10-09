@@ -49,7 +49,7 @@ public class IntermediaryServiceTest {
                 .name("Nowe")
                 .build();
 
-        Mockito.when(intermediaryDAO.update(intermediary)).thenReturn(intermediaryUpdate);
+        Mockito.when(intermediaryDAO.update(intermediaryUpdate)).thenReturn(intermediaryUpdate);
         Mockito.when(intermediaryDAO.findById(1L)).thenReturn(Optional.of(intermediary));
 
         Intermediary update = intermediaryService.update(intermediary.getId(), intermediaryUpdate);
