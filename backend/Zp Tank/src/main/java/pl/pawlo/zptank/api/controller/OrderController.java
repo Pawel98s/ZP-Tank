@@ -8,6 +8,7 @@ import pl.pawlo.zptank.api.dto.order.CreateOrderDTO;
 import pl.pawlo.zptank.api.dto.order.OrderDTO;
 import pl.pawlo.zptank.api.dto.order.UpdateOrderStatusDTO;
 import pl.pawlo.zptank.api.mapper.OrderMapper;
+import pl.pawlo.zptank.domain.OrderStatus;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.service.OrderService;
 
@@ -39,9 +40,15 @@ public class OrderController {
     }
 
     @GetMapping()
-    public List<OrderDTO> findAll() {
-        return orderService.findAll()
-                .stream()
+    public List<OrderDTO> findAll(@RequestParam(required = false) OrderStatus status) {
+        List<Order> orders;
+
+        if (status != null) {
+            orders = orderService.findByStatus(status);
+        } else {
+            orders = orderService.findAll();
+        }
+        return orders.stream()
                 .map(orderMapper::mapToDTO)
                 .toList();
     }
@@ -61,5 +68,8 @@ public class OrderController {
         return orderMapper.mapToDTO(order);
     }
 
-
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        orderService.deleteById(id);
+    }
 }

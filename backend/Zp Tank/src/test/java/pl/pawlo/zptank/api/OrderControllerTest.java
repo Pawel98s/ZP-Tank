@@ -1,8 +1,6 @@
 package pl.pawlo.zptank.api;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -21,11 +19,11 @@ import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(OrderController.class)
 public class OrderControllerTest {
@@ -239,5 +237,16 @@ public class OrderControllerTest {
         Mockito.verify(orderService).updateStatus(1L, OrderStatus.NEW);
 
         Mockito.verify(orderMapper).mapToDTO(order);
+    }
+
+    @Test
+    void shouldDeleteOrder() throws Exception {
+        mockMvc.perform(
+                        delete("/api/orders/1")
+                                .with(user("testUser"))
+                                .with(csrf()))
+                .andExpect(status().isOk());
+
+        Mockito.verify(orderService).deleteById(1L);
     }
 }
