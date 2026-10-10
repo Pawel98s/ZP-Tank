@@ -157,6 +157,24 @@ public class OrderService {
         return orderDAO.update(assignedOrder);
     }
 
+    public Order unassignTransport(Order order) {
+        Order unassignedOrder = Order.builder()
+                .id(order.getId())
+                .status(order.getStatus())
+                .orderRequest(order.getOrderRequest())
+                .createdAt(order.getCreatedAt())
+                .executionDate(order.getExecutionDate())
+                .plannedDeliveryDate(order.getPlannedDeliveryDate())
+                .deliveryDate(order.getDeliveryDate())
+                .intermediary(order.getIntermediary())
+                .waybill(order.getWaybill())
+                .deliveryAddress(order.getDeliveryAddress())
+                .transport(null)
+                .build();
+
+        return orderDAO.update(unassignedOrder);
+    }
+
     @Transactional
     public Order updateStatus(Long id, OrderStatus status) {
 
