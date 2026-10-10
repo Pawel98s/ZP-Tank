@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import pl.pawlo.zptank.api.dto.order.OrderRequestDTO;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {OrderMapper.class})
 public interface OrderRequestMapper {
 
     OrderRequest mapToDomain(OrderRequestDTO orderRequestDTO);

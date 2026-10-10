@@ -163,6 +163,7 @@ public class TransportService {
                 .build();
     }
 
+    @Transactional
     public void deleteTransport(Long transportId) {
         Transport transport = findById(transportId);
 

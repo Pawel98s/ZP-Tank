@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import pl.pawlo.zptank.api.dto.huzarsent.HuzarsentDTO;
 import pl.pawlo.zptank.domain.huzarsent.Huzarsent;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {OrderMapper.class})
 public interface HuzarsentMapper {
 
     Huzarsent mapToDomain(final HuzarsentDTO huzarsentDTO);

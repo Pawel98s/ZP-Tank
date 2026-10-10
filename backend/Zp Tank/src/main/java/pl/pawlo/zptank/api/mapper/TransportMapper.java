@@ -8,7 +8,7 @@ import pl.pawlo.zptank.domain.transport.CreateTransportRequest;
 import pl.pawlo.zptank.domain.transport.Transport;
 import pl.pawlo.zptank.domain.transport.UpdateTransportRequest;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {OrderMapper.class})
 public interface TransportMapper {
 
     Transport mapToDomain(final TransportDTO transportDTO);

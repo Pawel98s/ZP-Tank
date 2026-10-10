@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import pl.pawlo.zptank.api.dto.address.DeliveryAddressDTO;
 import pl.pawlo.zptank.domain.address.DeliveryAddress;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {OrderMapper.class})
 public interface DeliveryAddressMapper {
 
     DeliveryAddress mapToDomain(final DeliveryAddressDTO deliveryAddressDTO);
