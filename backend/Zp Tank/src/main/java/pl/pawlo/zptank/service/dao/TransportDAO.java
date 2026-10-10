@@ -1,5 +1,6 @@
 package pl.pawlo.zptank.service.dao;
 
+import pl.pawlo.zptank.domain.TransportStatus;
 import pl.pawlo.zptank.domain.transport.Transport;
 
 import java.util.List;
@@ -16,4 +17,8 @@ public interface TransportDAO {
     Transport update(Transport transport);
 
     void delete(Long id);
+
+    List<Transport> findByStatus(TransportStatus status);
+
+    List<Transport> findByDriverId(Long driverId);
 }

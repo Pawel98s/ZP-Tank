@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import pl.pawlo.zptank.database.entity.transport.TransportEntity;
 import pl.pawlo.zptank.database.repository.jpa.transport.TransportJpaRepository;
 import pl.pawlo.zptank.database.repository.mapper.TransportEntityMapper;
+import pl.pawlo.zptank.domain.TransportStatus;
 import pl.pawlo.zptank.domain.transport.Transport;
 import pl.pawlo.zptank.service.dao.TransportDAO;
 
@@ -47,5 +48,21 @@ public class TransportRepository implements TransportDAO {
     @Override
     public void delete(Long id) {
         transportJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Transport> findByStatus(TransportStatus status) {
+        return transportJpaRepository.findByStatus(status)
+                .stream()
+                .map(transportEntityMapper::mapToDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Transport> findByDriverId(Long driverId) {
+        return transportJpaRepository.findByDriverId(driverId)
+                .stream()
+                .map(transportEntityMapper::mapToDomain)
+                .toList();
     }
 }

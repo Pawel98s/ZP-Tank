@@ -193,6 +193,20 @@ public class TransportService {
         );
     }
 
+    public List<Transport> findAll() {
+        return transportDAO.findAll();
+    }
+
+
+    public List<Transport> findByStatus(TransportStatus status) {
+        return transportDAO.findByStatus(status);
+    }
+
+    public List<Transport> findByDriverId(Long driverId) {
+        Driver driver = driverService.findById(driverId);
+        return transportDAO.findByDriverId(driver.getId());
+    }
+
 
 
     private void validateOrderIds(List<Long> orderIds) {

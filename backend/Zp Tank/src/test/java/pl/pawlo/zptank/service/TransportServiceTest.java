@@ -9,10 +9,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.pawlo.zptank.domain.TransportStatus;
 import pl.pawlo.zptank.domain.order.Order;
-import pl.pawlo.zptank.domain.transport.CreateTransportRequest;
-import pl.pawlo.zptank.domain.transport.Driver;
-import pl.pawlo.zptank.domain.transport.LoadingTerminal;
-import pl.pawlo.zptank.domain.transport.Transport;
+import pl.pawlo.zptank.domain.transport.*;
 import pl.pawlo.zptank.service.dao.TransportDAO;
 
 import java.time.LocalDate;
@@ -343,6 +340,317 @@ public class TransportServiceTest {
                 .hasMessageContaining("not found");
 
         Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+    }
+
+
+    @Test
+    void shouldUpdateOnlyDriverAndLeaveRestUntouched() {
+        Order order = Order.builder().id(3L).build();
+        Driver oldDriver = Driver.builder().id(1L).build();
+        Driver newDriver = Driver.builder().id(7L).build();
+        LoadingTerminal terminal = LoadingTerminal.builder().id(2L).build();
+
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .driver(oldDriver)
+                .loadingTerminal(terminal)
+                .orders(List.of(order))
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(driverService.findById(7L)).thenReturn(newDriver);
+        Mockito.when(transportDAO.save(Mockito.any(Transport.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Transport result = transportService.updateTransport(5L,
+                UpdateTransportRequest.builder().driverId(7L).build());
+
+        Assertions.assertThat(result.getDriver()).isEqualTo(newDriver);
+        Assertions.assertThat(result.getLoadingTerminal()).isEqualTo(terminal);
+        Assertions.assertThat(result.getLoadingDate()).isEqualTo(LocalDate.of(2026, 10, 12));
+        Assertions.assertThat(result.getUnloadingDate()).isEqualTo(LocalDate.of(2026, 10, 13));
+        Assertions.assertThat(result.getOrders()).containsExactly(order);
+
+        Mockito.verifyNoInteractions(orderService, loadingTerminalService);
+    }
+
+    @Test
+    void shouldUpdateOnlyTerminal() {
+        Driver driver = Driver.builder().id(1L).build();
+        LoadingTerminal oldTerminal = LoadingTerminal.builder().id(2L).build();
+        LoadingTerminal newTerminal = LoadingTerminal.builder().id(8L).build();
+
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .driver(driver)
+                .loadingTerminal(oldTerminal)
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(loadingTerminalService.findById(8L)).thenReturn(newTerminal);
+        Mockito.when(transportDAO.save(Mockito.any(Transport.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Transport result = transportService.updateTransport(5L,
+                UpdateTransportRequest.builder().loadingTerminalId(8L).build());
+
+        Assertions.assertThat(result.getLoadingTerminal()).isEqualTo(newTerminal);
+        Assertions.assertThat(result.getDriver()).isEqualTo(driver);
+
+        Mockito.verifyNoInteractions(driverService, orderService);
+    }
+
+    @Test
+    void shouldUpdateOnlyDates() {
+        Driver driver = Driver.builder().id(1L).build();
+
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .driver(driver)
+                .loadingTerminal(LoadingTerminal.builder().id(2L).build())
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(transportDAO.save(Mockito.any(Transport.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Transport result = transportService.updateTransport(5L,
+                UpdateTransportRequest.builder()
+                        .loadingDate(LocalDate.of(2026, 10, 14))
+                        .unloadingDate(LocalDate.of(2026, 10, 15))
+                        .build());
+
+        Assertions.assertThat(result.getLoadingDate()).isEqualTo(LocalDate.of(2026, 10, 14));
+        Assertions.assertThat(result.getUnloadingDate()).isEqualTo(LocalDate.of(2026, 10, 15));
+        Assertions.assertThat(result.getDriver()).isEqualTo(driver);
+
+        Mockito.verifyNoInteractions(driverService, loadingTerminalService, orderService);
+    }
+
+    @Test
+    void shouldThrowWhenNewLoadingDateIsAfterExistingUnloadingDate() {
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+
+        Assertions.assertThatThrownBy(() -> transportService.updateTransport(5L,
+                        UpdateTransportRequest.builder().loadingDate(LocalDate.of(2026, 10, 20)).build()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unloading date");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TransportStatus.class, names = "PLANNED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldThrowWhenUpdatingTransportThatIsNotPlanned(TransportStatus status) {
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(status)
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+
+        Assertions.assertThatThrownBy(() -> transportService.updateTransport(5L,
+                        UpdateTransportRequest.builder().driverId(7L).build()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("PLANNED");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    void shouldThrowWhenUpdatingNonExistingTransport() {
+        Mockito.when(transportDAO.findById(99L)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> transportService.updateTransport(99L,
+                        UpdateTransportRequest.builder().driverId(7L).build()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("not found");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    void shouldThrowWhenOrderIdsIsEmptyList() {
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+
+        Assertions.assertThatThrownBy(() -> transportService.updateTransport(5L,
+                        UpdateTransportRequest.builder().orderIds(List.of()).build()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("empty");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+        Mockito.verifyNoInteractions(orderService);
+    }
+
+    @Test
+    void shouldThrowWhenOrderIsAssignedToAnotherTransport() {
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .orders(List.of())
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Order takenOrder = Order.builder()
+                .id(3L)
+                .transport(Transport.builder().id(99L).build())
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(orderService.findById(3L)).thenReturn(takenOrder);
+
+        Assertions.assertThatThrownBy(() -> transportService.updateTransport(5L,
+                        UpdateTransportRequest.builder().orderIds(List.of(3L)).build()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("[3]");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+        Mockito.verify(orderService, Mockito.never()).assignTransport(Mockito.any(), Mockito.any());
+        Mockito.verify(orderService, Mockito.never()).unassignTransport(Mockito.any());
+    }
+
+    @Test
+    void shouldNotTreatOrderAlreadyInThisTransportAsConflict() {
+        Transport sameTransport = Transport.builder().id(5L).build();
+        Order orderInThisTransport = Order.builder().id(3L).transport(sameTransport).build();
+
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .orders(List.of(orderInThisTransport))
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(orderService.findById(3L)).thenReturn(orderInThisTransport);
+        Mockito.when(transportDAO.save(Mockito.any(Transport.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        Transport result = transportService.updateTransport(5L,
+                UpdateTransportRequest.builder().orderIds(List.of(3L)).build());
+
+        Assertions.assertThat(result.getOrders()).containsExactly(orderInThisTransport);
+
+        Mockito.verify(orderService, Mockito.never()).assignTransport(Mockito.any(), Mockito.any());
+        Mockito.verify(orderService, Mockito.never()).unassignTransport(Mockito.any());
+    }
+
+    @Test
+    void shouldUnassignRemovedOrderAndAssignNewOne() {
+        Transport sameTransport = Transport.builder().id(5L).build();
+        Order removed = Order.builder().id(3L).transport(sameTransport).build();
+        Order kept = Order.builder().id(4L).transport(sameTransport).build();
+        Order added = Order.builder().id(6L).build();
+
+        Transport existing = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .orders(List.of(removed, kept))
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(transportDAO.findById(5L)).thenReturn(Optional.of(existing));
+        Mockito.when(orderService.findById(4L)).thenReturn(kept);
+        Mockito.when(orderService.findById(6L)).thenReturn(added);
+        Mockito.when(transportDAO.save(Mockito.any(Transport.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        Mockito.when(orderService.assignTransport(Mockito.eq(added), Mockito.any())).thenReturn(added);
+
+        Transport result = transportService.updateTransport(5L,
+                UpdateTransportRequest.builder().orderIds(List.of(4L, 6L)).build());
+
+        Assertions.assertThat(result.getOrders()).containsExactlyInAnyOrder(kept, added);
+
+        Mockito.verify(orderService).unassignTransport(removed);
+        Mockito.verify(orderService, Mockito.never()).unassignTransport(kept);
+        Mockito.verify(orderService).assignTransport(Mockito.eq(added), Mockito.any());
+        Mockito.verify(orderService, Mockito.never()).assignTransport(Mockito.eq(kept), Mockito.any());
+    }
+
+    @Test
+    void shouldFindTransportsByDriverId() {
+        Transport transport = Transport.builder()
+                .id(5L)
+                .driver(Driver.builder().id(7L).build())
+                .build();
+
+
+        Mockito.when(transportDAO.findByDriverId(7L)).thenReturn(List.of(transport));
+        Mockito.when(driverService.findById(7L)).thenReturn(Driver.builder().id(7L).build());
+
+        List<Transport> result = transportService.findByDriverId(7L);
+
+        Assertions.assertThat(result).containsExactly(transport);
+    }
+
+    @Test
+    void shouldFindTransportsByStatus() {
+        Transport transport1 = Transport.builder()
+                .id(5L)
+                .status(TransportStatus.PLANNED)
+                .build();
+
+        Transport transport2 = Transport.builder()
+                .id(6L)
+                .status(TransportStatus.PLANNED)
+                .build();
+
+        Mockito.when(transportDAO.findByStatus(TransportStatus.PLANNED)).thenReturn(List.of(transport1, transport2));
+
+        List<Transport> result = transportService.findByStatus(TransportStatus.PLANNED);
+
+        Assertions.assertThat(result).containsExactlyInAnyOrder(transport1, transport2);
+    }
+
+
+    @Test
+    void shouldFindAllTransports() {
+        Transport transport1 = Transport.builder()
+                .id(5L)
+                .build();
+
+        Transport transport2 = Transport.builder()
+                .id(6L)
+                .build();
+
+        Mockito.when(transportDAO.findAll()).thenReturn(List.of(transport1, transport2));
+
+        List<Transport> result = transportService.findAll();
+
+        Assertions.assertThat(result).containsExactlyInAnyOrder(transport1, transport2);
     }
 
 
