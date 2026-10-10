@@ -11,6 +11,7 @@ import pl.pawlo.zptank.domain.intermediary.Intermediary;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.domain.order.OrderRequest;
 import pl.pawlo.zptank.domain.order.Waybill;
+import pl.pawlo.zptank.domain.transport.Transport;
 import pl.pawlo.zptank.service.dao.OrderDAO;
 
 import java.time.LocalDate;
@@ -136,6 +137,24 @@ public class OrderService {
                 .build();
 
         return orderDAO.update(updatedOrder);
+    }
+
+    public Order assignTransport(Order order, Transport transport) {
+        Order assignedOrder = Order.builder()
+                .id(order.getId())
+                .status(order.getStatus())
+                .orderRequest(order.getOrderRequest())
+                .createdAt(order.getCreatedAt())
+                .executionDate(order.getExecutionDate())
+                .plannedDeliveryDate(order.getPlannedDeliveryDate())
+                .deliveryDate(order.getDeliveryDate())
+                .intermediary(order.getIntermediary())
+                .waybill(order.getWaybill())
+                .deliveryAddress(order.getDeliveryAddress())
+                .transport(transport)
+                .build();
+
+        return orderDAO.update(assignedOrder);
     }
 
     @Transactional
