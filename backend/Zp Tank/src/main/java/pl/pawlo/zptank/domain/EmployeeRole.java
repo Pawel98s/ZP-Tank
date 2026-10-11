@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum EmployeeRole {
     ADMIN("Admin"),
-    USER("User");
+    USER("User"),
+    DRIVER("Driver");
 
     final String label;
-}
+    }
