@@ -28,6 +28,12 @@ public class TransportService {
 
         Driver driver = driverService.findById(createTransportRequest.getDriverId());
         LoadingTerminal loadingTerminal = loadingTerminalService.findById(createTransportRequest.getLoadingTerminalId());
+        validateDriverAvailability(
+                driver.getId(),
+                createTransportRequest.getLoadingDate(),
+                createTransportRequest.getUnloadingDate(),
+                null
+        );
         List<Order> orders = createTransportRequest.getOrderIds().stream()
                 .map(orderService::findById)
                 .toList();
@@ -122,6 +128,10 @@ public class TransportService {
                         "Orders already assigned to another transport: " + assignedElsewhere
                 );
             }
+        }
+
+        if (driver != null) {
+            validateDriverAvailability(driver.getId(), loadingDate, unloadingDate, transportId);
         }
 
         Transport savedTransport = transportDAO.save(
@@ -228,6 +238,21 @@ public class TransportService {
         }
         if (unloadingDate.isBefore(loadingDate)) {
             throw new IllegalArgumentException("Unloading date cannot be before loading date");
+        }
+    }
+
+    private void validateDriverAvailability(
+            Long driverId,
+            LocalDate loadingDate,
+            LocalDate unloadingDate,
+            Long excludedTransportId
+    ) {
+        if (transportDAO.existsDriverScheduleConflict(
+                driverId, loadingDate, unloadingDate, excludedTransportId
+        )) {
+            throw new IllegalStateException(
+                    "Driver " + driverId + " is already assigned to another transport in this period"
+            );
         }
     }
 

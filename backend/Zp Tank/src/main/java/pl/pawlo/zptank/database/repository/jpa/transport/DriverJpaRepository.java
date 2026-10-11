@@ -11,6 +11,8 @@ public interface DriverJpaRepository extends JpaRepository<DriverEntity,Long> {
 
     List<DriverEntity> findByLastNameContainingIgnoreCase(String lastName);
 
+    boolean existsByTransportSetId(Long transportSetId);
 
+    boolean existsByTransportSetIdAndIdNot(Long transportSetId, Long driverId);
 
 }

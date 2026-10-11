@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.pawlo.zptank.domain.transport.Driver;
+import pl.pawlo.zptank.domain.transport.TransportSet;
 import pl.pawlo.zptank.service.dao.DriverDAO;
 
 import java.util.List;
@@ -38,6 +39,21 @@ public class DriverServiceTest {
         Assertions.assertThat(save).isEqualTo(driver);
         Assertions.assertThat(save.getFirstName()).isEqualTo(driver.getFirstName());
         Assertions.assertThat(save.getLastName()).isEqualTo(driver.getLastName());
+    }
+
+    @Test
+    void shouldNotAssignTransportSetAlreadyAssignedToAnotherDriver() {
+        Driver driver = Driver.builder()
+                .transportSet(TransportSet.builder().id(10L).build())
+                .build();
+
+        Mockito.when(driverDAO.existsByTransportSetId(10L)).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> driverService.save(driver))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("already assigned");
+
+        Mockito.verify(driverDAO, Mockito.never()).save(Mockito.any());
     }
 
     @Test

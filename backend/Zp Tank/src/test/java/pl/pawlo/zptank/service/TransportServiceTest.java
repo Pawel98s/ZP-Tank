@@ -81,6 +81,32 @@ public class TransportServiceTest {
     }
 
     @Test
+    void shouldThrowWhenDriverIsAlreadyAssignedInRequestedPeriod() {
+        Driver driver = Driver.builder().id(1L).build();
+        CreateTransportRequest request = CreateTransportRequest.builder()
+                .driverId(1L)
+                .loadingTerminalId(2L)
+                .orderIds(List.of(3L))
+                .loadingDate(LocalDate.of(2026, 10, 12))
+                .unloadingDate(LocalDate.of(2026, 10, 13))
+                .build();
+
+        Mockito.when(driverService.findById(1L)).thenReturn(driver);
+        Mockito.when(loadingTerminalService.findById(2L))
+                .thenReturn(LoadingTerminal.builder().id(2L).build());
+        Mockito.when(transportDAO.existsDriverScheduleConflict(
+                1L, request.getLoadingDate(), request.getUnloadingDate(), null
+        )).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> transportService.createTransport(request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("already assigned");
+
+        Mockito.verify(transportDAO, Mockito.never()).save(Mockito.any());
+        Mockito.verifyNoInteractions(orderService);
+    }
+
+    @Test
     void shouldThrowWhenOrderAlreadyAssigned() {
         Order assignedOrder = Order.builder()
                 .id(3L)

@@ -5,6 +5,7 @@ import pl.pawlo.zptank.domain.transport.Transport;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface TransportDAO {
 
@@ -21,4 +22,11 @@ public interface TransportDAO {
     List<Transport> findByStatus(TransportStatus status);
 
     List<Transport> findByDriverId(Long driverId);
+
+    boolean existsDriverScheduleConflict(
+            Long driverId,
+            LocalDate loadingDate,
+            LocalDate unloadingDate,
+            Long excludedTransportId
+    );
 }

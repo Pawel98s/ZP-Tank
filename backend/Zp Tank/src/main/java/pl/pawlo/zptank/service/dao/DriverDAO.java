@@ -18,4 +18,8 @@ public interface DriverDAO {
     void delete(Long id);
 
     List<Driver> findByLastName(String lastName);
+
+    boolean existsByTransportSetId(Long transportSetId);
+
+    boolean existsByTransportSetIdAndIdNot(Long transportSetId, Long driverId);
 }

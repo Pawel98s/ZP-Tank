@@ -11,6 +11,7 @@ import pl.pawlo.zptank.service.dao.TransportDAO;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Repository
 @AllArgsConstructor
@@ -64,5 +65,17 @@ public class TransportRepository implements TransportDAO {
                 .stream()
                 .map(transportEntityMapper::mapToDomain)
                 .toList();
+    }
+
+    @Override
+    public boolean existsDriverScheduleConflict(
+            Long driverId,
+            LocalDate loadingDate,
+            LocalDate unloadingDate,
+            Long excludedTransportId
+    ) {
+        return transportJpaRepository.existsDriverScheduleConflict(
+                driverId, loadingDate, unloadingDate, excludedTransportId
+        );
     }
 }

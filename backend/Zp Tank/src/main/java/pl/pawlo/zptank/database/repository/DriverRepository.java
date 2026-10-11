@@ -59,5 +59,15 @@ public class DriverRepository implements DriverDAO {
                 .toList();
     }
 
+    @Override
+    public boolean existsByTransportSetId(Long transportSetId) {
+        return driverJpaRepository.existsByTransportSetId(transportSetId);
+    }
+
+    @Override
+    public boolean existsByTransportSetIdAndIdNot(Long transportSetId, Long driverId) {
+        return driverJpaRepository.existsByTransportSetIdAndIdNot(transportSetId, driverId);
+    }
+
 
 }

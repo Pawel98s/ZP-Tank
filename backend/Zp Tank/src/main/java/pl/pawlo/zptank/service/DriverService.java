@@ -3,6 +3,7 @@ package pl.pawlo.zptank.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.transport.Driver;
+import pl.pawlo.zptank.domain.transport.TransportSet;
 import pl.pawlo.zptank.service.dao.DriverDAO;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class DriverService {
     private final DriverDAO driverDAO;
 
     public Driver save(Driver driver) {
+        validateTransportSetAvailability(driver.getTransportSet(), null);
         return driverDAO.save(driver);
     }
 
@@ -32,6 +34,10 @@ public class DriverService {
 
     public Driver update(Long id, Driver driver) {
         Driver existingDriver = findById(id);
+        TransportSet transportSet = driver.getTransportSet() != null
+                ? driver.getTransportSet()
+                : existingDriver.getTransportSet();
+        validateTransportSetAvailability(transportSet, id);
 
         Driver updatedDriver = Driver.builder()
                 .id(existingDriver.getId())
@@ -53,9 +59,7 @@ public class DriverService {
                 .active(driver.getActive() != null
                         ? driver.getActive()
                         : existingDriver.getActive())
-                .transportSet(driver.getTransportSet() != null
-                        ? driver.getTransportSet()
-                        : existingDriver.getTransportSet())
+                .transportSet(transportSet)
                 .driverCardValidUntil(driver.getDriverCardValidUntil() != null
                         ? driver.getDriverCardValidUntil()
                         : existingDriver.getDriverCardValidUntil())
@@ -83,6 +87,22 @@ public class DriverService {
                 .build();
 
         return driverDAO.update(updatedDriver);
+    }
+
+    private void validateTransportSetAvailability(TransportSet transportSet, Long driverId) {
+        if (transportSet == null || transportSet.getId() == null) {
+            return;
+        }
+
+        boolean assignedToAnotherDriver = driverId == null
+                ? driverDAO.existsByTransportSetId(transportSet.getId())
+                : driverDAO.existsByTransportSetIdAndIdNot(transportSet.getId(), driverId);
+
+        if (assignedToAnotherDriver) {
+            throw new IllegalStateException(
+                    "Transport set " + transportSet.getId() + " is already assigned to another driver"
+            );
+        }
     }
 
     public void delete(Long id) {
