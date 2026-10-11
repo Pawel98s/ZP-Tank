@@ -13,6 +13,8 @@ public interface OrderDAO {
 
     Optional<Order> findById(Long id);
 
+    boolean existsByOrderRequestId(Long orderRequestId);
+
     List<Order> findAll();
 
     Order update(Order order);

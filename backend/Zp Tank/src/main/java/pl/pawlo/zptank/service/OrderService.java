@@ -50,6 +50,11 @@ public class OrderService {
 
         OrderRequest orderRequest = orderRequestService.findById(orderRequestId);
 
+        if (orderDAO.existsByOrderRequestId(orderRequestId)) {
+            throw new IllegalStateException(
+                    "Order already exists for order request: " + orderRequestId
+            );
+        }
 
         Intermediary intermediary = intermediaryService.findById(intermediaryId);
 

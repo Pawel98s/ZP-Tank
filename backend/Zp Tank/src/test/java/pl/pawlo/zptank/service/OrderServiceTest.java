@@ -43,6 +43,32 @@ public class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
+    @Test
+    void shouldNotCreateSecondOrderForTheSameOrderRequest() {
+        Long orderRequestId = 1L;
+
+        OrderRequest orderRequest = OrderRequest.builder()
+                .id(orderRequestId)
+                .build();
+
+        when(orderRequestService.findById(orderRequestId))
+                .thenReturn(orderRequest);
+        when(orderDAO.existsByOrderRequestId(orderRequestId))
+                .thenReturn(true);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> orderService.create(orderRequestId, 2L, null)
+        );
+
+        assertEquals(
+                "Order already exists for order request: 1",
+                exception.getMessage()
+        );
+        verify(orderDAO).existsByOrderRequestId(orderRequestId);
+        verify(orderDAO, never()).save(any(Order.class));
+        verifyNoInteractions(intermediaryService, deliveryAddressService, waybillService);
+    }
 
     @Test
     void shouldCreateOrderWithExistingDeliveryAddress() {

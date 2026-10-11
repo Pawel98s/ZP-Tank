@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum EmployeeRole {
     ADMIN("Admin"),
     USER("User"),
-    DRIVER("Driver");
+    DRIVER("Driver"),
+    MECHANIC("Mechanic");
 
     final String label;
     }

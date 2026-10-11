@@ -35,6 +35,11 @@ public class OrderRepository implements OrderDAO {
     }
 
     @Override
+    public boolean existsByOrderRequestId(Long orderRequestId) {
+        return orderJpaRepository.existsByOrderRequestId(orderRequestId);
+    }
+
+    @Override
     public List<Order> findAll() {
         return orderJpaRepository.findAll()
                 .stream()
