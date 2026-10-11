@@ -121,6 +121,8 @@ public class OrderServiceTest {
 
         when(deliveryAddressService.findById(deliveryAddressId))
                 .thenReturn(deliveryAddress);
+        when(deliveryAddressService.belongsToClient(deliveryAddressId, client.getId()))
+                .thenReturn(true);
 
         when(waybillService.generate())
                 .thenReturn(waybill);
@@ -247,6 +249,30 @@ public class OrderServiceTest {
 
         verify(deliveryAddressService, never())
                 .findById(anyLong());
+    }
+
+    @Test
+    void shouldRejectDeliveryAddressFromAnotherClient() {
+        Long orderRequestId = 1L;
+        Long deliveryAddressId = 3L;
+        Client client = Client.builder().id(10L).build();
+        OrderRequest orderRequest = OrderRequest.builder()
+                .id(orderRequestId)
+                .client(client)
+                .build();
+
+        when(orderRequestService.findById(orderRequestId)).thenReturn(orderRequest);
+        when(orderDAO.existsByOrderRequestId(orderRequestId)).thenReturn(false);
+        when(deliveryAddressService.belongsToClient(deliveryAddressId, client.getId()))
+                .thenReturn(false);
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> orderService.create(orderRequestId, 2L, deliveryAddressId)
+        );
+
+        verify(deliveryAddressService, never()).findById(deliveryAddressId);
+        verifyNoInteractions(waybillService);
     }
 
     @Test

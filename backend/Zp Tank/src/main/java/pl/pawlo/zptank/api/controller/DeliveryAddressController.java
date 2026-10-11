@@ -8,6 +8,8 @@ import pl.pawlo.zptank.api.mapper.DeliveryAddressMapper;
 import pl.pawlo.zptank.domain.address.DeliveryAddress;
 import pl.pawlo.zptank.service.DeliveryAddressService;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/delivery-address")
@@ -28,6 +30,13 @@ public class DeliveryAddressController {
     public DeliveryAddressDTO findById(@PathVariable Long id) {
         DeliveryAddress deliveryAddress = deliveryAddressService.findById(id);
         return deliveryAddressMapper.mapToDTO(deliveryAddress);
+    }
+
+    @GetMapping("/client/{clientId}")
+    public List<DeliveryAddressDTO> findByClientId(@PathVariable Long clientId) {
+        return deliveryAddressService.findByClientId(clientId).stream()
+                .map(deliveryAddressMapper::mapToDTO)
+                .toList();
     }
 
     @PatchMapping("/{id}")

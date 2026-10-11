@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.address.DeliveryAddress;
 import pl.pawlo.zptank.service.dao.DeliveryAddressDAO;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class DeliveryAddressService {
@@ -19,6 +21,14 @@ public class DeliveryAddressService {
     public DeliveryAddress findById(Long id){
         return deliveryAddressDAO.findById(id)
                 .orElseThrow(() -> new RuntimeException("Delivery address not found"));
+    }
+
+    public List<DeliveryAddress> findByClientId(Long clientId) {
+        return deliveryAddressDAO.findByClientId(clientId);
+    }
+
+    public boolean belongsToClient(Long addressId, Long clientId) {
+        return deliveryAddressDAO.existsByIdAndClientId(addressId, clientId);
     }
 
 

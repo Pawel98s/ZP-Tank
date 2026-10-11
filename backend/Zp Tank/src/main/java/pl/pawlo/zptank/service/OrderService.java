@@ -62,13 +62,22 @@ public class OrderService {
         DeliveryAddress deliveryAddress;
 
         if (deliveryAddressId != null) {
-
-
+            Long clientId = orderRequest.getClient().getId();
+            if (!deliveryAddressService.belongsToClient(deliveryAddressId, clientId)) {
+                throw new IllegalStateException(
+                        "Delivery address does not belong to order request client"
+                );
+            }
             deliveryAddress = deliveryAddressService.findById(deliveryAddressId);
 
         } else {
 
             Client client = orderRequest.getClient();
+            if (!deliveryAddressService.findByClientId(client.getId()).isEmpty()) {
+                throw new IllegalStateException(
+                        "Delivery address must be selected for this client"
+                );
+            }
 
             Address companyAddress = client.getCompanyAddress();
 

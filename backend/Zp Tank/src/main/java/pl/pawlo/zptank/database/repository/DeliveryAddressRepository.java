@@ -9,6 +9,7 @@ import pl.pawlo.zptank.domain.address.DeliveryAddress;
 import pl.pawlo.zptank.service.dao.DeliveryAddressDAO;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 @AllArgsConstructor
@@ -31,6 +32,19 @@ public class DeliveryAddressRepository implements DeliveryAddressDAO {
     }
 
     @Override
+    public List<DeliveryAddress> findByClientId(Long clientId) {
+        return deliveryAddressJpaRepository.findByClientId(clientId)
+                .stream()
+                .map(deliveryAddressEntityMapper::mapToDomain)
+                .toList();
+    }
+
+    @Override
+    public boolean existsByIdAndClientId(Long addressId, Long clientId) {
+        return deliveryAddressJpaRepository.existsByIdAndClientId(addressId, clientId);
+    }
+
+    @Override
     public DeliveryAddress update(DeliveryAddress deliveryAddress) {
         DeliveryAddressEntity save = deliveryAddressJpaRepository
                 .save(deliveryAddressEntityMapper.mapToEntity(deliveryAddress));
@@ -42,4 +56,3 @@ public class DeliveryAddressRepository implements DeliveryAddressDAO {
         deliveryAddressJpaRepository.deleteById(id);
     }
 }
-
