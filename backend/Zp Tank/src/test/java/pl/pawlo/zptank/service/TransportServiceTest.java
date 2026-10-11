@@ -38,7 +38,7 @@ public class TransportServiceTest {
 
     @Test
     void shouldCreateTransport() {
-        Driver driver = Driver.builder().id(1L).build();
+        Driver driver = validDriver(1L);
         LoadingTerminal loadingTerminal = LoadingTerminal.builder().id(2L).build();
         Order order1 = Order.builder().id(3L).build();
         Order order2 = Order.builder().id(4L).build();
@@ -82,7 +82,7 @@ public class TransportServiceTest {
 
     @Test
     void shouldThrowWhenDriverIsAlreadyAssignedInRequestedPeriod() {
-        Driver driver = Driver.builder().id(1L).build();
+        Driver driver = validDriver(1L);
         CreateTransportRequest request = CreateTransportRequest.builder()
                 .driverId(1L)
                 .loadingTerminalId(2L)
@@ -121,7 +121,7 @@ public class TransportServiceTest {
                 .unloadingDate(LocalDate.now().plusDays(1))
                 .build();
 
-        Mockito.when(driverService.findById(1L)).thenReturn(Driver.builder().id(1L).build());
+        Mockito.when(driverService.findById(1L)).thenReturn(validDriver(1L));
         Mockito.when(loadingTerminalService.findById(2L)).thenReturn(LoadingTerminal.builder().id(2L).build());
         Mockito.when(orderService.findById(3L)).thenReturn(assignedOrder);
 
@@ -146,6 +146,35 @@ public class TransportServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
 
         Mockito.verifyNoInteractions(driverService, loadingTerminalService, orderService, transportDAO);
+    }
+
+    private Driver validDriver(Long id) {
+        LocalDate validUntil = LocalDate.of(2030, 1, 1);
+        return Driver.builder()
+                .id(id)
+                .active(true)
+                .transportSet(TransportSet.builder()
+                        .id(10L)
+                        .active(true)
+                        .tankerTruck(TankerTruck.builder()
+                                .id(11L)
+                                .insuranceValidUntil(validUntil)
+                                .periodicInspectionDate(validUntil)
+                                .intermediateInspectionDate(validUntil)
+                                .redStripeValidUntil(validUntil)
+                                .onLegalizationValidUntil(validUntil)
+                                .pbLegalizationValidUntil(validUntil)
+                                .build())
+                        .build())
+                .driverCardValidUntil(validUntil)
+                .adrValidUntil(validUntil)
+                .identityDocumentValidUntil(validUntil)
+                .psychologicalExaminationValidUntil(validUntil)
+                .tdtValidUntil(validUntil)
+                .drivingLicenseValidUntil(validUntil)
+                .healthAndSafetyTrainingValidUntil(validUntil)
+                .medicalExaminationValidUntil(validUntil)
+                .build();
     }
 
     @Test

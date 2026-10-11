@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.TransportStatus;
+import pl.pawlo.zptank.domain.OrderStatus;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.domain.transport.*;
 import pl.pawlo.zptank.service.dao.TransportDAO;
@@ -28,6 +29,7 @@ public class TransportService {
 
         Driver driver = driverService.findById(createTransportRequest.getDriverId());
         LoadingTerminal loadingTerminal = loadingTerminalService.findById(createTransportRequest.getLoadingTerminalId());
+        validateDriverAndVehicle(driver, createTransportRequest.getUnloadingDate());
         validateDriverAvailability(
                 driver.getId(),
                 createTransportRequest.getLoadingDate(),
@@ -37,6 +39,8 @@ public class TransportService {
         List<Order> orders = createTransportRequest.getOrderIds().stream()
                 .map(orderService::findById)
                 .toList();
+
+        validateOrdersCanBeTransported(orders);
 
         List<Long> alreadyAssigned = orders.stream()
                 .filter(order -> order.getTransport() != null)
@@ -252,6 +256,83 @@ public class TransportService {
         )) {
             throw new IllegalStateException(
                     "Driver " + driverId + " is already assigned to another transport in this period"
+            );
+        }
+    }
+
+    private void validateDriverAndVehicle(Driver driver, LocalDate validThrough) {
+        if (!Boolean.TRUE.equals(driver.getActive())) {
+            throw new IllegalStateException("Driver is inactive");
+        }
+        if (driver.getTransportSet() == null) {
+            throw new IllegalStateException("Driver has no transport set assigned");
+        }
+        if (!driver.getTransportSet().isActive()) {
+            throw new IllegalStateException("Transport set is inactive");
+        }
+
+        validateDate(driver.getDriverCardValidUntil(), validThrough, "Driver card");
+        validateDate(driver.getAdrValidUntil(), validThrough, "Driver ADR");
+        validateDate(driver.getIdentityDocumentValidUntil(), validThrough, "Driver identity document");
+        validateDate(driver.getPsychologicalExaminationValidUntil(), validThrough, "Driver psychological examination");
+        validateDate(driver.getTdtValidUntil(), validThrough, "Driver TDT");
+        validateDate(driver.getDrivingLicenseValidUntil(), validThrough, "Driver driving license");
+        validateDate(driver.getHealthAndSafetyTrainingValidUntil(), validThrough, "Driver health and safety training");
+        validateDate(driver.getMedicalExaminationValidUntil(), validThrough, "Driver medical examination");
+
+        TransportSet transportSet = driver.getTransportSet();
+        if (transportSet.getTankerTruck() != null) {
+            validateTankerTruck(transportSet.getTankerTruck(), validThrough);
+        } else {
+            if (transportSet.getTractor() == null || transportSet.getTrailer() == null) {
+                throw new IllegalStateException("Transport set configuration is incomplete");
+            }
+            validateTractor(transportSet.getTractor(), validThrough);
+            validateTrailer(transportSet.getTrailer(), validThrough);
+        }
+    }
+
+    private void validateOrdersCanBeTransported(List<Order> orders) {
+        List<Long> invalidOrderIds = orders.stream()
+                .filter(order -> order.getStatus() == OrderStatus.CANCELLED
+                        || order.getStatus() == OrderStatus.DELIVERED)
+                .map(Order::getId)
+                .toList();
+
+        if (!invalidOrderIds.isEmpty()) {
+            throw new IllegalStateException(
+                    "Cancelled or delivered orders cannot be assigned: " + invalidOrderIds
+            );
+        }
+    }
+
+    private void validateTractor(Tractor tractor, LocalDate validThrough) {
+        validateDate(tractor.getInsuranceValidUntil(), validThrough, "Tractor insurance");
+        validateDate(tractor.getPeriodicInspectionDate(), validThrough, "Tractor periodic inspection");
+    }
+
+    private void validateTrailer(Trailer trailer, LocalDate validThrough) {
+        validateDate(trailer.getInsuranceValidUntil(), validThrough, "Trailer insurance");
+        validateDate(trailer.getPeriodicInspectionDate(), validThrough, "Trailer periodic inspection");
+        validateDate(trailer.getIntermediateInspectionDate(), validThrough, "Trailer intermediate inspection");
+        validateDate(trailer.getRedStripeValidUntil(), validThrough, "Trailer red stripe");
+        validateDate(trailer.getOnLegalizationValidUntil(), validThrough, "Trailer ON legalization");
+        validateDate(trailer.getPbLegalizationValidUntil(), validThrough, "Trailer PB legalization");
+    }
+
+    private void validateTankerTruck(TankerTruck tankerTruck, LocalDate validThrough) {
+        validateDate(tankerTruck.getInsuranceValidUntil(), validThrough, "Tanker truck insurance");
+        validateDate(tankerTruck.getPeriodicInspectionDate(), validThrough, "Tanker truck periodic inspection");
+        validateDate(tankerTruck.getIntermediateInspectionDate(), validThrough, "Tanker truck intermediate inspection");
+        validateDate(tankerTruck.getRedStripeValidUntil(), validThrough, "Tanker truck red stripe");
+        validateDate(tankerTruck.getOnLegalizationValidUntil(), validThrough, "Tanker truck ON legalization");
+        validateDate(tankerTruck.getPbLegalizationValidUntil(), validThrough, "Tanker truck PB legalization");
+    }
+
+    private void validateDate(LocalDate date, LocalDate validThrough, String documentName) {
+        if (date == null || date.isBefore(validThrough)) {
+            throw new IllegalStateException(
+                    documentName + " is missing or expires before transport ends"
             );
         }
     }
