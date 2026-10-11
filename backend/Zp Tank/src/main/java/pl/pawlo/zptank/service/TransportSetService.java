@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.transport.TankerTruck;
@@ -28,7 +29,7 @@ public class TransportSetService {
 
     public TransportSet findById(Long id) {
         return transportSetDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transport set not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transport set not found"));
     }
 
     public List<TransportSet> findAll() {

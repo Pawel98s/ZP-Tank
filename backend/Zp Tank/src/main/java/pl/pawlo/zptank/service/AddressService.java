@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.address.Address;
@@ -18,7 +19,7 @@ public class AddressService {
 
     public Address findById(Long id) {
         return addressDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
 

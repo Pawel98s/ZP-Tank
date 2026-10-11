@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.company.Company;
@@ -18,7 +19,7 @@ public class CompanyService {
 
     public Company findById(Long id){
         return companyDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found"));
     }
 
     @Transactional

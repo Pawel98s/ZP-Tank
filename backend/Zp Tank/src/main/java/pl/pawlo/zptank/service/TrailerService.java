@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.transport.Trailer;
@@ -20,7 +21,7 @@ public class TrailerService {
 
     public Trailer findById(Long id) {
         return trailerDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Trailer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Trailer not found"));
     }
 
     public List<Trailer> findAll() {

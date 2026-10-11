@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.employee.Employee;
 import pl.pawlo.zptank.service.dao.EmployeeDAO;
@@ -19,7 +20,7 @@ public class EmployeeService {
 
     public Employee findById(Long id) {
         return employeeDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
     }
 
     public void deleteById(Long id) {

@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.intermediary.Intermediary;
 import pl.pawlo.zptank.service.dao.IntermediaryDAO;
@@ -19,7 +20,7 @@ public class IntermediaryService {
 
     public Intermediary findById(Long id) {
         return intermediaryDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Intermediary not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Intermediary not found"));
     }
 
     public List<Intermediary> findAll() {

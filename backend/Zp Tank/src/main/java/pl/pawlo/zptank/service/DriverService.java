@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.transport.Driver;
 import pl.pawlo.zptank.domain.transport.TransportSet;
@@ -21,7 +22,7 @@ public class DriverService {
 
     public Driver findById(Long id) {
         return driverDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Driver not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Driver not found"));
     }
 
     public List<Driver> findAll() {

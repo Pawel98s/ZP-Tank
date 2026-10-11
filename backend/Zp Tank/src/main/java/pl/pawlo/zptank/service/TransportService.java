@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.TransportStatus;
 import pl.pawlo.zptank.domain.OrderStatus;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.domain.transport.*;
 import pl.pawlo.zptank.service.dao.TransportDAO;
@@ -20,6 +21,7 @@ public class TransportService {
     private final DriverService driverService;
     private final LoadingTerminalService loadingTerminalService;
     private final OrderService orderService;
+    private final AuditHistoryService auditHistoryService;
 
 
     @Transactional
@@ -80,7 +82,7 @@ public class TransportService {
 
     public Transport findById(Long id) {
         return transportDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transport not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transport not found"));
     }
 
     @Transactional
@@ -149,6 +151,9 @@ public class TransportService {
                         .unloadingDate(unloadingDate)
                         .build()
         );
+        if (auditHistoryService != null) auditHistoryService.record("TRANSPORT", transportId, "UPDATE",
+                transport.getStatus() + ":" + transport.getLoadingDate() + ":" + transport.getUnloadingDate(),
+                savedTransport.getStatus() + ":" + savedTransport.getLoadingDate() + ":" + savedTransport.getUnloadingDate());
 
         List<Order> finalOrders = transport.getOrders();
 
@@ -195,7 +200,7 @@ public class TransportService {
     public Transport updateStatus(Long transportId, TransportStatus newStatus) {
         Transport transport = findById(transportId);
 
-        return transportDAO.save(
+        Transport result = transportDAO.save(
                 Transport.builder()
                         .id(transport.getId())
                         .status(newStatus)
@@ -206,6 +211,9 @@ public class TransportService {
                         .unloadingDate(transport.getUnloadingDate())
                         .build()
         );
+        if (auditHistoryService != null) auditHistoryService.record("TRANSPORT", transportId, "STATUS",
+                transport.getStatus().name(), newStatus.name());
+        return result;
     }
 
     public List<Transport> findAll() {
@@ -220,6 +228,10 @@ public class TransportService {
     public List<Transport> findByDriverId(Long driverId) {
         Driver driver = driverService.findById(driverId);
         return transportDAO.findByDriverId(driver.getId());
+    }
+
+    public boolean hasScheduleConflict(Long driverId, LocalDate from, LocalDate to, Long excludeId) {
+        return transportDAO.existsDriverScheduleConflict(driverId, from, to, excludeId);
     }
 
 

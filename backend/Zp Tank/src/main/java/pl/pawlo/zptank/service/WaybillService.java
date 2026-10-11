@@ -2,6 +2,7 @@ package pl.pawlo.zptank.service;
 
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.order.Waybill;
@@ -23,7 +24,7 @@ public class WaybillService {
 
     public Waybill findById(Long id) {
         return waybillDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Waybill set not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Waybill set not found"));
     }
 
     public List<Waybill> findAll() {

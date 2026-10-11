@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.transport.LoadingTerminal;
 import pl.pawlo.zptank.service.dao.LoadingTerminalDAO;
@@ -19,7 +20,7 @@ public class LoadingTerminalService {
 
     public LoadingTerminal findById(Long id) {
         return loadingTerminalDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Loading terminal not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Loading terminal not found"));
     }
 
     public List<LoadingTerminal> findAll() {

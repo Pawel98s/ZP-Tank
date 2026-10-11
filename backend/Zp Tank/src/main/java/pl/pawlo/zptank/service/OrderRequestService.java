@@ -1,6 +1,7 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.pawlo.zptank.domain.OrderRequestStatus;
 import pl.pawlo.zptank.domain.order.OrderRequest;
@@ -20,7 +21,7 @@ public class OrderRequestService {
 
     public OrderRequest findById(Long id){
         return orderRequestDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("OrderRequest not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order request not found"));
     }
 
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pawlo.zptank.domain.OrderStatus;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import pl.pawlo.zptank.domain.address.Address;
 import pl.pawlo.zptank.domain.address.DeliveryAddress;
 import pl.pawlo.zptank.domain.client.Client;
@@ -27,6 +28,7 @@ public class OrderService {
     private final IntermediaryService intermediaryService;
     private final DeliveryAddressService deliveryAddressService;
     private final WaybillService waybillService;
+    private final AuditHistoryService auditHistoryService;
 
     public Order save(Order order) {
        return orderDAO.save(order);
@@ -34,7 +36,7 @@ public class OrderService {
 
     public Order findById(Long id){
       return orderDAO.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
     }
 
     public List<Order> findAll(){
@@ -150,7 +152,10 @@ public class OrderService {
                 )
                 .build();
 
-        return orderDAO.update(updatedOrder);
+        Order result = orderDAO.update(updatedOrder);
+        if (auditHistoryService != null) auditHistoryService.record("ORDER", id, "UPDATE",
+                existingOrder.toString(), result.toString());
+        return result;
     }
 
     public Order assignTransport(Order order, Transport transport) {
@@ -208,7 +213,10 @@ public class OrderService {
                 .transport(existingOrder.getTransport())
                 .build();
 
-        return orderDAO.update(updatedOrder);
+        Order result = orderDAO.update(updatedOrder);
+        if (auditHistoryService != null) auditHistoryService.record("ORDER", id, "STATUS",
+                existingOrder.getStatus().name(), status.name());
+        return result;
     }
 
     public List<Order> findByStatus(OrderStatus status) {
