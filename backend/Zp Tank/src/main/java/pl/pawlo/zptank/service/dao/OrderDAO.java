@@ -6,6 +6,8 @@ import pl.pawlo.zptank.domain.order.Order;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface OrderDAO {
 
@@ -34,5 +36,14 @@ public interface OrderDAO {
     List<Order> findByExecutionDate(LocalDate date);
 
     List<Order> findByExecutionDateBetween(LocalDate from, LocalDate to);
+
+    Page<Order> search(OrderStatus status, Long clientId, String waybill, String text,
+                       LocalDate from, LocalDate to, Pageable pageable);
+
+    long countOnTimeDeliveries();
+    long countOverdue(LocalDate today);
+    long countDelivered();
+    long countByStatus(OrderStatus status);
+    long count();
 
 }

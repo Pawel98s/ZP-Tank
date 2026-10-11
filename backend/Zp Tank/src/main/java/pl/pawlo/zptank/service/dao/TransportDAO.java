@@ -6,6 +6,8 @@ import pl.pawlo.zptank.domain.transport.Transport;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TransportDAO {
 
@@ -29,4 +31,12 @@ public interface TransportDAO {
             LocalDate unloadingDate,
             Long excludedTransportId
     );
+
+    Page<Transport> search(TransportStatus status, Long driverId, Long vehicleId, Long terminalId,
+                           String text, LocalDate from, LocalDate to, Pageable pageable);
+
+    long countByLoadingDate(LocalDate date);
+    long countWithoutDriverOrVehicle();
+    long countByStatus(TransportStatus status);
+    long count();
 }

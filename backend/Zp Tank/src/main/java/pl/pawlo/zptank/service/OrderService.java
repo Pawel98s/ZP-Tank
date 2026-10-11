@@ -18,6 +18,8 @@ import pl.pawlo.zptank.service.dao.OrderDAO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @AllArgsConstructor
@@ -245,6 +247,31 @@ public class OrderService {
 
     public List<Order> findByExecutionDateBetween(LocalDate from, LocalDate to) {
         return orderDAO.findByExecutionDateBetween(from, to);
+    }
+
+    public Page<Order> search(OrderStatus status, Long clientId, String waybill, String text,
+                              LocalDate from, LocalDate to, Pageable pageable) {
+        return orderDAO.search(status, clientId, waybill, text, from, to, pageable);
+    }
+
+    public long countOnTimeDeliveries() {
+        return orderDAO.countOnTimeDeliveries();
+    }
+
+    public long countOverdue(LocalDate today) {
+        return orderDAO.countOverdue(today);
+    }
+
+    public long countDelivered() {
+        return orderDAO.countDelivered();
+    }
+
+    public long countByStatus(OrderStatus status) {
+        return orderDAO.countByStatus(status);
+    }
+
+    public long count() {
+        return orderDAO.count();
     }
 
 }

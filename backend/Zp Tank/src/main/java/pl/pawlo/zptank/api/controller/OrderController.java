@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.time.LocalDate;
 import pl.pawlo.zptank.api.dto.PageResponse;
 import java.util.Locale;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @AllArgsConstructor
@@ -68,32 +70,20 @@ public class OrderController {
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(defaultValue = "executionDate,asc") String sort) {
-            var values = orderService.findAll().stream().filter(o -> status == null || o.getStatus() == status)
-                    .filter(o -> clientId == null || (o.getOrderRequest() != null && o.getOrderRequest().getClient() != null
-                            && clientId.equals(o.getOrderRequest().getClient().getId())))
-                    .filter(o -> from == null || (o.getExecutionDate() != null && !o.getExecutionDate().isBefore(from)))
-                    .filter(o -> to == null || (o.getExecutionDate() != null && !o.getExecutionDate().isAfter(to)))
-                    .filter(o -> waybill == null || (o.getWaybill() != null && o.getWaybill().getWaybillNumber() != null
-                            && o.getWaybill().getWaybillNumber().toLowerCase().contains(waybill.toLowerCase())))
-                    .filter(o -> matchesText(o, text))
-                    .sorted(orderComparator(sort)).map(orderMapper::mapToDTO).toList();
-            return PageResponse.of(values, page, size);
+            return PageResponse.of(orderService.search(status, clientId, waybill, text, from, to,
+                    PageRequest.of(Math.max(0, page), Math.max(1, size), orderSort(sort)))
+                    .map(orderMapper::mapToDTO));
     }
 
-    private Comparator<Order> orderComparator(String sort) {
+    private Sort orderSort(String sort) {
         String[] parts = sort == null ? new String[0] : sort.split(",", 2);
         String field = parts.length == 0 ? "executionDate" : parts[0].trim();
         boolean desc = parts.length > 1 && "desc".equalsIgnoreCase(parts[1].trim());
-        Comparator<Order> comparator = switch (field) {
-            case "id" -> Comparator.comparing(Order::getId, Comparator.nullsLast(Long::compareTo));
-            case "status" -> Comparator.comparing(o -> o.getStatus() == null ? "" : o.getStatus().name());
-            case "createdAt" -> Comparator.comparing(Order::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "plannedDeliveryDate" -> Comparator.comparing(Order::getPlannedDeliveryDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "deliveryDate" -> Comparator.comparing(Order::getDeliveryDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "executionDate" -> Comparator.comparing(Order::getExecutionDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            default -> Comparator.comparing(Order::getExecutionDate, Comparator.nullsLast(Comparator.naturalOrder()));
+        String property = switch (field) {
+            case "id", "status", "createdAt", "plannedDeliveryDate", "deliveryDate", "executionDate" -> field;
+            default -> "executionDate";
         };
-        return desc ? comparator.reversed() : comparator;
+        return Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, property);
     }
 
     private boolean matchesText(Order order, String text) {

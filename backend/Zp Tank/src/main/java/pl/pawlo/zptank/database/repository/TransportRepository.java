@@ -12,6 +12,8 @@ import pl.pawlo.zptank.service.dao.TransportDAO;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 @AllArgsConstructor
@@ -77,5 +79,32 @@ public class TransportRepository implements TransportDAO {
         return transportJpaRepository.existsDriverScheduleConflict(
                 driverId, loadingDate, unloadingDate, excludedTransportId
         );
+    }
+
+    @Override
+    public Page<Transport> search(TransportStatus status, Long driverId, Long vehicleId, Long terminalId,
+                                  String text, LocalDate from, LocalDate to, Pageable pageable) {
+        return transportJpaRepository.search(status, driverId, vehicleId, terminalId, text, from, to, pageable)
+                .map(transportEntityMapper::mapToDomain);
+    }
+
+    @Override
+    public long countByLoadingDate(LocalDate date) {
+        return transportJpaRepository.countByLoadingDate(date);
+    }
+
+    @Override
+    public long countWithoutDriverOrVehicle() {
+        return transportJpaRepository.countWithoutDriverOrVehicle();
+    }
+
+    @Override
+    public long countByStatus(TransportStatus status) {
+        return transportJpaRepository.countByStatus(status);
+    }
+
+    @Override
+    public long count() {
+        return transportJpaRepository.count();
     }
 }

@@ -13,6 +13,8 @@ import pl.pawlo.zptank.service.dao.OrderDAO;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 @AllArgsConstructor
@@ -115,5 +117,37 @@ public class OrderRepository implements OrderDAO {
                 .stream()
                 .map(orderEntityMapper::mapToDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Order> search(OrderStatus status, Long clientId, String waybill, String text,
+                              LocalDate from, LocalDate to, Pageable pageable) {
+        return orderJpaRepository.search(status, clientId, waybill, text, from, to, pageable)
+                .map(orderEntityMapper::mapToDomain);
+    }
+
+    @Override
+    public long countOnTimeDeliveries() {
+        return orderJpaRepository.countOnTimeDeliveries();
+    }
+
+    @Override
+    public long countOverdue(LocalDate today) {
+        return orderJpaRepository.countOverdue(today);
+    }
+
+    @Override
+    public long countDelivered() {
+        return orderJpaRepository.countByDeliveryDateIsNotNull();
+    }
+
+    @Override
+    public long countByStatus(OrderStatus status) {
+        return orderJpaRepository.countByStatus(status);
+    }
+
+    @Override
+    public long count() {
+        return orderJpaRepository.count();
     }
 }

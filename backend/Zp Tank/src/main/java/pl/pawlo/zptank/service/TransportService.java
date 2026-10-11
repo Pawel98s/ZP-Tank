@@ -12,6 +12,8 @@ import pl.pawlo.zptank.service.dao.TransportDAO;
 
 import java.time.LocalDate;
 import java.util.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @AllArgsConstructor
@@ -232,6 +234,27 @@ public class TransportService {
 
     public boolean hasScheduleConflict(Long driverId, LocalDate from, LocalDate to, Long excludeId) {
         return transportDAO.existsDriverScheduleConflict(driverId, from, to, excludeId);
+    }
+
+    public Page<Transport> search(TransportStatus status, Long driverId, Long vehicleId, Long terminalId,
+                                  String text, LocalDate from, LocalDate to, Pageable pageable) {
+        return transportDAO.search(status, driverId, vehicleId, terminalId, text, from, to, pageable);
+    }
+
+    public long countByLoadingDate(LocalDate date) {
+        return transportDAO.countByLoadingDate(date);
+    }
+
+    public long countWithoutDriverOrVehicle() {
+        return transportDAO.countWithoutDriverOrVehicle();
+    }
+
+    public long countByStatus(TransportStatus status) {
+        return transportDAO.countByStatus(status);
+    }
+
+    public long count() {
+        return transportDAO.count();
     }
 
 

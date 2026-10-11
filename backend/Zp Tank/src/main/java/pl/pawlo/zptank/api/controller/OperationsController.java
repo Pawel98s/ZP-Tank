@@ -18,30 +18,27 @@ public class OperationsController {
     private final ExpiryAlertService expiryAlerts;
     @GetMapping("/dashboard")
     public Map<String, Object> dashboard() {
-        var allOrders = orders.findAll();
-        var allTransports = transports.findAll();
         LocalDate today = LocalDate.now();
-        long delivered = allOrders.stream().filter(o -> o.getDeliveryDate() != null).count();
-        long onTime = allOrders.stream().filter(o -> o.getDeliveryDate() != null && o.getPlannedDeliveryDate() != null
-                && !o.getDeliveryDate().isAfter(o.getPlannedDeliveryDate())).count();
-        long overdue = allOrders.stream().filter(o -> o.getDeliveryDate() == null
-                && o.getPlannedDeliveryDate() != null && o.getPlannedDeliveryDate().isBefore(today)).count();
-        long todayTransports = allTransports.stream().filter(t -> today.equals(t.getLoadingDate())).count();
-        long tomorrowTransports = allTransports.stream().filter(t -> today.plusDays(1).equals(t.getLoadingDate())).count();
-        long withoutVehicle = allTransports.stream().filter(t -> t.getDriver() == null
-                || t.getDriver().getTransportSet() == null || !t.getDriver().getTransportSet().isActive()).count();
+        long orderCount = orders.count();
+        long transportCount = transports.count();
+        long delivered = orders.countDelivered();
+        long onTime = orders.countOnTimeDeliveries();
+        long overdue = orders.countOverdue(today);
+        long todayTransports = transports.countByLoadingDate(today);
+        long tomorrowTransports = transports.countByLoadingDate(today.plusDays(1));
+        long withoutVehicle = transports.countWithoutDriverOrVehicle();
         Map<String, Long> orderStatusTotals = new java.util.LinkedHashMap<>();
         for (OrderStatus status : OrderStatus.values()) {
-            orderStatusTotals.put(status.name(), allOrders.stream().filter(o -> o.getStatus() == status).count());
+            orderStatusTotals.put(status.name(), orders.countByStatus(status));
         }
         Map<String, Long> transportStatusTotals = new java.util.LinkedHashMap<>();
         for (TransportStatus status : TransportStatus.values()) {
-            transportStatusTotals.put(status.name(), allTransports.stream().filter(t -> t.getStatus() == status).count());
+            transportStatusTotals.put(status.name(), transports.countByStatus(status));
         }
         Map<String, Object> response = new java.util.LinkedHashMap<>();
-        response.put("orders", allOrders.size());
-        response.put("transports", allTransports.size());
-        response.put("newOrders", allOrders.stream().filter(o -> o.getStatus() == OrderStatus.NEW).count());
+        response.put("orders", orderCount);
+        response.put("transports", transportCount);
+        response.put("newOrders", orders.countByStatus(OrderStatus.NEW));
         response.put("todayTransports", todayTransports);
         response.put("tomorrowTransports", tomorrowTransports);
         response.put("overdueOrders", overdue);

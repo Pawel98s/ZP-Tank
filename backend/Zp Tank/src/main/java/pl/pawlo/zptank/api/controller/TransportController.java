@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.time.LocalDate;
 import pl.pawlo.zptank.api.dto.PageResponse;
 import java.util.Locale;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @AllArgsConstructor
@@ -44,49 +46,20 @@ public class TransportController {
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(defaultValue = "loadingDate,asc") String sort) {
-        var values = transportService.findAll().stream().filter(t -> status == null || t.getStatus() == status)
-                .filter(t -> driverId == null || (t.getDriver() != null && driverId.equals(t.getDriver().getId())))
-                .filter(t -> vehicleId == null || (t.getDriver() != null && t.getDriver().getTransportSet() != null
-                        && ((t.getDriver().getTransportSet().getTractor() != null && vehicleId.equals(t.getDriver().getTransportSet().getTractor().getId()))
-                        || (t.getDriver().getTransportSet().getTrailer() != null && vehicleId.equals(t.getDriver().getTransportSet().getTrailer().getId()))
-                        || (t.getDriver().getTransportSet().getTankerTruck() != null && vehicleId.equals(t.getDriver().getTransportSet().getTankerTruck().getId())))))
-                .filter(t -> terminalId == null || (t.getLoadingTerminal() != null && terminalId.equals(t.getLoadingTerminal().getId())))
-                .filter(t -> from == null || (t.getLoadingDate() != null && !t.getLoadingDate().isBefore(from)))
-                .filter(t -> to == null || (t.getLoadingDate() != null && !t.getLoadingDate().isAfter(to)))
-                .filter(t -> matchesText(t, text))
-                .sorted(transportComparator(sort)).map(transportMapper::mapToDTO).toList();
-        return PageResponse.of(values, page, size);
+        return PageResponse.of(transportService.search(status, driverId, vehicleId, terminalId, text, from, to,
+                PageRequest.of(Math.max(0, page), Math.max(1, size), transportSort(sort)))
+                .map(transportMapper::mapToDTO));
     }
 
-    private boolean matchesText(Transport transport, String text) {
-        if (text == null || text.isBlank()) return true;
-        String query = text.toLowerCase(Locale.ROOT);
-        if (transport.getDriver() != null) {
-            String driver = (safe(transport.getDriver().getFirstName()) + " "
-                    + safe(transport.getDriver().getLastName())).toLowerCase(Locale.ROOT);
-            if (driver.contains(query)) return true;
-            var set = transport.getDriver().getTransportSet();
-            if (set != null) {
-                if (set.getTractor() != null && safe(set.getTractor().getRegistrationNumber()).toLowerCase(Locale.ROOT).contains(query)) return true;
-                if (set.getTrailer() != null && safe(set.getTrailer().getRegistrationNumber()).toLowerCase(Locale.ROOT).contains(query)) return true;
-                if (set.getTankerTruck() != null && safe(set.getTankerTruck().getRegistrationNumber()).toLowerCase(Locale.ROOT).contains(query)) return true;
-            }
-        }
-        return false;
-    }
-
-    private Comparator<Transport> transportComparator(String sort) {
+    private Sort transportSort(String sort) {
         String[] parts = sort == null ? new String[0] : sort.split(",", 2);
         String field = parts.length == 0 ? "loadingDate" : parts[0].trim();
         boolean desc = parts.length > 1 && "desc".equalsIgnoreCase(parts[1].trim());
-        Comparator<Transport> comparator = switch (field) {
-            case "id" -> Comparator.comparing(Transport::getId, Comparator.nullsLast(Long::compareTo));
-            case "status" -> Comparator.comparing(t -> t.getStatus() == null ? "" : t.getStatus().name());
-            case "unloadingDate" -> Comparator.comparing(Transport::getUnloadingDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "loadingDate" -> Comparator.comparing(Transport::getLoadingDate, Comparator.nullsLast(Comparator.naturalOrder()));
-            default -> Comparator.comparing(Transport::getLoadingDate, Comparator.nullsLast(Comparator.naturalOrder()));
+        String property = switch (field) {
+            case "id", "status", "unloadingDate", "loadingDate" -> field;
+            default -> "loadingDate";
         };
-        return desc ? comparator.reversed() : comparator;
+        return Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, property);
     }
 
     private String safe(String value) { return value == null ? "" : value; }
