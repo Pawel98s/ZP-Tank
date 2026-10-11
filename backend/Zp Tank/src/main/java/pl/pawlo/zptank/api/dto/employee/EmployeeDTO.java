@@ -18,7 +18,6 @@ public class EmployeeDTO {
     private String email;
     private EmployeeRole role;
     private String login;
-    private String password;
     private Boolean workplaceInstruction;
     private Boolean kseCertificate;
     private LocalDate medicalExaminationValidUntil;

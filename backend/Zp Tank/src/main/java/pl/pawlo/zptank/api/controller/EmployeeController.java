@@ -1,9 +1,11 @@
 package pl.pawlo.zptank.api.controller;
 
 import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.pawlo.zptank.api.dto.employee.EmployeeDTO;
+import pl.pawlo.zptank.api.dto.employee.CreateEmployeeRequestDTO;
 import pl.pawlo.zptank.api.mapper.EmployeeMapper;
 import pl.pawlo.zptank.domain.employee.Employee;
 import pl.pawlo.zptank.service.EmployeeService;
@@ -20,7 +22,8 @@ public class EmployeeController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public EmployeeDTO save(@RequestBody EmployeeDTO employeeDTO) {
+    public EmployeeDTO save(
+            @Valid @RequestBody CreateEmployeeRequestDTO employeeDTO) {
         Employee save = employeeService.save(employeeMapper.mapToDomain(employeeDTO));
         return employeeMapper.mapToDTO(save);
     }

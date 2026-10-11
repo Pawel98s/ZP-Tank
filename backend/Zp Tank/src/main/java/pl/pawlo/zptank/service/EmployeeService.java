@@ -1,8 +1,9 @@
 package pl.pawlo.zptank.service;
 
 import lombok.AllArgsConstructor;
-import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.pawlo.zptank.api.exception.ResourceNotFoundException;
 import pl.pawlo.zptank.domain.employee.Employee;
 import pl.pawlo.zptank.service.dao.EmployeeDAO;
 
@@ -13,9 +14,29 @@ import java.util.List;
 public class EmployeeService {
 
     private final EmployeeDAO employeeDAO;
+    private final PasswordEncoder passwordEncoder;
 
     public Employee save(Employee employee) {
-        return employeeDAO.save(employee);
+        Employee securedEmployee = Employee.builder()
+                .firstName(employee.getFirstName())
+                .lastName(employee.getLastName())
+                .phone(employee.getPhone())
+                .email(employee.getEmail())
+                .role(employee.getRole())
+                .login(employee.getLogin())
+                .password(employee.getPassword() == null
+                        ? null
+                        : passwordEncoder.encode(employee.getPassword()))
+                .workplaceInstruction(employee.getWorkplaceInstruction())
+                .kseCertificate(employee.getKseCertificate())
+                .medicalExaminationValidUntil(
+                        employee.getMedicalExaminationValidUntil())
+                .trainingValidUntil(employee.getTrainingValidUntil())
+                .healthAndSafetyValidUntil(
+                        employee.getHealthAndSafetyValidUntil())
+                .build();
+
+        return employeeDAO.save(securedEmployee);
     }
 
     public Employee findById(Long id) {
@@ -34,6 +55,9 @@ public class EmployeeService {
 
     public Employee update(Long id, Employee employee) {
         Employee existingEmployee = findById(id);
+        String password = employee.getPassword() == null
+                ? existingEmployee.getPassword()
+                : passwordEncoder.encode(employee.getPassword());
 
         Employee updatedEmployee = Employee.builder()
                 .id(existingEmployee.getId())
@@ -55,9 +79,7 @@ public class EmployeeService {
                 .login(employee.getLogin() != null
                         ? employee.getLogin()
                         : existingEmployee.getLogin())
-                .password(employee.getPassword() != null
-                        ? employee.getPassword()
-                        : existingEmployee.getPassword())
+                .password(password)
                 .medicalExaminationValidUntil(employee.getMedicalExaminationValidUntil() != null
                         ? employee.getMedicalExaminationValidUntil()
                         : existingEmployee.getMedicalExaminationValidUntil())

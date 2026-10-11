@@ -36,10 +36,10 @@ public class EmployeeEntity {
     @Column(name = "role", nullable = false, length = 20)
     private EmployeeRole role;
 
-    @Column(name = "login")
+    @Column(name = "login", nullable = false, unique = true)
     private String login;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "workplace_instruction", nullable = false)

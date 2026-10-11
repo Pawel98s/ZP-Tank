@@ -13,6 +13,8 @@ import pl.pawlo.zptank.api.mapper.OrderMapper;
 import pl.pawlo.zptank.domain.OrderStatus;
 import pl.pawlo.zptank.domain.order.Order;
 import pl.pawlo.zptank.service.OrderService;
+import pl.pawlo.zptank.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +38,12 @@ public class OrderControllerTest {
 
     @MockitoBean
     private OrderMapper orderMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Test
     void shouldCreateOrder() throws Exception {

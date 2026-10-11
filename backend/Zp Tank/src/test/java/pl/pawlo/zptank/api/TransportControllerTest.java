@@ -15,6 +15,8 @@ import pl.pawlo.zptank.domain.transport.CreateTransportRequest;
 import pl.pawlo.zptank.domain.transport.Transport;
 import pl.pawlo.zptank.domain.transport.UpdateTransportRequest;
 import pl.pawlo.zptank.service.TransportService;
+import pl.pawlo.zptank.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
@@ -35,6 +37,12 @@ class TransportControllerTest {
 
     @MockitoBean
     private TransportMapper transportMapper;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @Test
     void shouldCreateTransport() throws Exception {
