@@ -63,12 +63,15 @@ public class EmployeeService {
                 .trainingValidUntil(employee.getTrainingValidUntil() != null
                         ? employee.getTrainingValidUntil()
                         : existingEmployee.getTrainingValidUntil())
-                .trainingValidUntil(employee.getTrainingValidUntil() != null
-                        ? employee.getTrainingValidUntil()
-                        : existingEmployee.getTrainingValidUntil())
                 .healthAndSafetyValidUntil(employee.getHealthAndSafetyValidUntil() != null
                         ? employee.getHealthAndSafetyValidUntil()
                         : existingEmployee.getHealthAndSafetyValidUntil())
+                .workplaceInstruction(employee.getWorkplaceInstruction() != null
+                        ? employee.getWorkplaceInstruction()
+                        : existingEmployee.getWorkplaceInstruction())
+                .kseCertificate(employee.getKseCertificate() != null
+                        ? employee.getKseCertificate()
+                        : existingEmployee.getKseCertificate())
                 .build();
 
         return employeeDAO.save(updatedEmployee);
